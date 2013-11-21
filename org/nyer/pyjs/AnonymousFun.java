@@ -24,7 +24,7 @@ public class AnonymousFun extends DefFun {
 				Object ret = new Void();
 				List<Instrument> instruments = AnonymousFun.this.instruments;
 				for (int i = 0, s = instruments.size();i < s;i ++) {
-					ret = instruments.get(0).invoke(newEnv);
+					ret = instruments.get(i).invoke(newEnv);
 				}
 				return ret;
 			}
