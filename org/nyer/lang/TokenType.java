@@ -1,0 +1,15 @@
+package org.nyer.lang;
+
+public enum TokenType {
+	DOT,
+	OPEN_PARENTHESIS,
+	CLOSE_PARENTHESIS,
+	IDENTIFIER,
+	ASSIGN,
+	ADD,
+	SUB,
+	MULTI,
+	INTEGER,
+	OPEN_BRACE,
+	CLOSE_BRACE;
+}
