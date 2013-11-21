@@ -22,4 +22,16 @@ public class TestCase {
 		String code = "a = 3; b = a + 5 * 2 - 1; c = b + b; println(c)";
 		interpreter.run(code);
 	}
+	
+	@Test
+	public void testCloure() throws Exception {
+		String code = "a = function(e) { function() {println(e)}}; f = a(3); f()";
+		interpreter.run(code);
+	}
+	
+	@Test
+	public void testAnonymous() throws Exception {
+		String code = "(function (a) {println(a);}) (100)";
+		interpreter.run(code);
+	}
 }
