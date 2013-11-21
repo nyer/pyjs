@@ -2,7 +2,7 @@ package test;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.nyer.lang.Interpreter;
+import org.nyer.pyjs.Interpreter;
 
 public class TestCase {
 	static Interpreter interpreter;
