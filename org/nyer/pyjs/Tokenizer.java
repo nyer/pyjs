@@ -42,45 +42,107 @@ public class Tokenizer {
 		
 		if (code.length() > 0) {
 			Token token = null;
+			TokenType type;
 			StringBuilder tokenStr = new StringBuilder();
 			char ch = code.charAt(0);
-			if (Character.isDigit(ch)) {
+			if (Character.isDigit(ch) || ch == '.') {
+				boolean dotExist = false;
 				do {
 					ch = code.charAt(0);
 					if (Character.isDigit(ch))
 						tokenStr.append(ch);
-					else
+					else if (dotExist == false && ch == '.') {
+						dotExist = true;
+						tokenStr.append(ch);
+					} else
 						break;
 					code.deleteCharAt(0);
 				} while (code.length() > 0);
-				token = new Token(tokenStr.toString(), INTEGER);
+				if (tokenStr.equals("."))
+					type = DOT;
+				else
+					type = NUMBER;
 			} else if (ch == '+') {
-				token = new Token("+", ADD);
+				tokenStr.append(ch);
+				type = ADD;
 				code.deleteCharAt(0);
 			} else if (ch == '-') {
-				token = new Token("-", SUB);
+				tokenStr.append(ch);
+				type = SUB;
 				code.deleteCharAt(0);
 			} else if (ch == ',') {
-				token = new Token(",", DOT);
+				tokenStr.append(ch);
+				type = COMMA;
 				code.deleteCharAt(0);
 			} else if (ch == '*') {
-				token = new Token("*", MULTI);
+				tokenStr.append(ch);
+				type = MULTI;
 				code.deleteCharAt(0);
-			} else if (ch == '(') {
-				token = new Token("(", OPEN_PARENTHESIS);
+			} else if (ch == '/') {
+				tokenStr.append(ch);
+				type = DIV;
+				code.deleteCharAt(0);
+			}  else if (ch == '(') {
+				tokenStr.append(ch);
+				type = OPEN_PARENTHESIS;
 				code.deleteCharAt(0);
 			} else if (ch == ')') {
-				token = new Token(")", CLOSE_PARENTHESIS);
+				tokenStr.append(ch);
+				type = CLOSE_PARENTHESIS;
 				code.deleteCharAt(0);
 			} else if (ch == '{') {
-				token = new Token("{", OPEN_BRACE);
+				tokenStr.append(ch);
+				type = OPEN_BRACE;
 				code.deleteCharAt(0);
 			} else if (ch == '}') {
-				token = new Token("}", CLOSE_BRACE);
+				tokenStr.append(ch);
+				type = CLOSE_BRACE;
 				code.deleteCharAt(0);
 			} else if (ch == '=') {
-				token = new Token("=", ASSIGN);
+				tokenStr.append(ch);
+				type = ASSIGN;
 				code.deleteCharAt(0);
+				if (code.length() > 0 && code.charAt(0) == '=') {
+					type = EQ;
+					tokenStr.append('=');
+					code.deleteCharAt(0);
+				}
+			} else if (ch == '>') {
+				tokenStr.append(ch);
+				type = GT;
+				code.deleteCharAt(0);
+				if (code.length() > 0 && code.charAt(0) == '=') {
+					type = GTE;
+					tokenStr.append('=');
+					code.deleteCharAt(0);
+				}
+			} else if (ch == '<') {
+				tokenStr.append(ch);
+				type = LT;
+				code.deleteCharAt(0);
+				if (code.length() > 0 && code.charAt(0) == '=') {
+					type = LTE;
+					tokenStr.append('=');
+					code.deleteCharAt(0);
+				}
+			} else if (ch == '|') {
+				tokenStr.append(ch);
+				type = UNKNOW;
+				code.deleteCharAt(0);
+				if (code.length() > 0 && code.charAt(0) == '|') {
+					type = OR;
+					tokenStr.append('|');
+					code.deleteCharAt(0);
+				}
+			} else if (ch == '&') {
+				tokenStr.append(ch);
+				type = UNKNOW;
+				code.deleteCharAt(0);
+				if (code.length() > 0 && code.charAt(0) == '&') {
+					type = AND;
+					tokenStr.append('&');
+					code.deleteCharAt(0);
+				}
 			} else {
 				do {
 					ch = code.charAt(0);
@@ -90,8 +152,31 @@ public class Tokenizer {
 						break;
 					code.deleteCharAt(0);
 				} while (code.length() > 0);
-				token = new Token(tokenStr.toString(), IDENTIFIER);
+				String str = tokenStr.toString();
+				if ("if".equals(str)) {
+					type = IF;
+				} else if ("elif".equals(str)) {
+					type = ELIF;
+				} else if ("else".equals(str)) {
+					type = ELSE;
+				} else if ("true".equals(str)) {
+					type = BOOLEAN;
+				} else if ("false".equals(str)) {
+					type = BOOLEAN;
+				} else if ("while".equals(str)) {
+					type = WHILE;
+				} else if ("for".equals(str)) {
+					type = FOR;
+				} else if ("break".equals(str)) {
+					type = BREAK;
+				} else if ("return".equals(str)) {
+					type = RETURN;
+				} else {
+					type = IDENTIFIER;
+				}
 			}
+
+			token = new Token(tokenStr.toString(), type);
 			return token;
 		}
 		

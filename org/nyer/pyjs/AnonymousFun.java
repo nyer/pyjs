@@ -3,8 +3,11 @@ package org.nyer.pyjs;
 import java.util.Arrays;
 import java.util.List;
 
+import org.nyer.pyjs.primitive.ControlFun;
 import org.nyer.pyjs.primitive.Instrument;
-import org.nyer.pyjs.primitive.Void;
+import org.nyer.pyjs.primitive.Return;
+import org.nyer.pyjs.primitive.type.ReturnResult;
+import org.nyer.pyjs.primitive.type.Void;
 
 public class AnonymousFun extends DefFun {
 
@@ -19,12 +22,23 @@ public class AnonymousFun extends DefFun {
 			
 			@Override
 			public Object invoke(Env env, Object[] arguments) throws Exception {
-				Env newEnv = closure.extend(getParameters(), arguments);
+				Env newEnv = closure.extend(getParameters(), evalArguments(closure, arguments));
 				
 				Object ret = new Void();
 				List<Instrument> instruments = AnonymousFun.this.instruments;
 				for (int i = 0, s = instruments.size();i < s;i ++) {
-					ret = instruments.get(i).invoke(newEnv);
+					Instrument instrument = instruments.get(i);
+					if (instrument.getFun() instanceof Return) {
+						Object returnV = new Void();
+						i = i + 1;
+						if (i < s) {
+							instrument = instruments.get(i);
+							if (instrument.getFun() instanceof ControlFun == false)
+								returnV = instrument.invoke(newEnv);
+						}
+						return returnV;
+					}
+					ret = instrument.invoke(newEnv);
 				}
 				return ret;
 			}

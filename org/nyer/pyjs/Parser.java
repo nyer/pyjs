@@ -5,15 +5,29 @@ import static org.nyer.pyjs.TokenType.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nyer.pyjs.primitive.Add;
-import org.nyer.pyjs.primitive.Assign;
+import org.nyer.pyjs.primitive.Break;
+import org.nyer.pyjs.primitive.Cond;
 import org.nyer.pyjs.primitive.FunCall;
 import org.nyer.pyjs.primitive.Identifier;
 import org.nyer.pyjs.primitive.Instrument;
-import org.nyer.pyjs.primitive.Integer;
-import org.nyer.pyjs.primitive.Multi;
-import org.nyer.pyjs.primitive.Sub;
+import org.nyer.pyjs.primitive.Return;
 import org.nyer.pyjs.primitive.Value;
+import org.nyer.pyjs.primitive.While;
+import org.nyer.pyjs.primitive.operator.Add;
+import org.nyer.pyjs.primitive.operator.And;
+import org.nyer.pyjs.primitive.operator.Assign;
+import org.nyer.pyjs.primitive.operator.Div;
+import org.nyer.pyjs.primitive.operator.EQ;
+import org.nyer.pyjs.primitive.operator.GT;
+import org.nyer.pyjs.primitive.operator.GTE;
+import org.nyer.pyjs.primitive.operator.LT;
+import org.nyer.pyjs.primitive.operator.LTE;
+import org.nyer.pyjs.primitive.operator.Multi;
+import org.nyer.pyjs.primitive.operator.NE;
+import org.nyer.pyjs.primitive.operator.Or;
+import org.nyer.pyjs.primitive.operator.Sub;
+import org.nyer.pyjs.primitive.type.Boolean;
+import org.nyer.pyjs.primitive.type.Number;
 
 public class Parser {
 	private Tokenizer tokenizer;
@@ -39,45 +53,71 @@ public class Parser {
 	}
 	
 	private Instrument expression() throws Exception {
-		return addSubExp();
+		return logicExp();
 	}
 	
+	private Instrument logicExp() throws Exception {
+		Instrument instrument = eqExp();
+		while (tokenizer.peek(AND) || tokenizer.peek(OR)) {
+			if (tokenizer.accept(AND)) {
+				instrument = new Instrument(new And(), instrument, eqExp());
+			} else if (tokenizer.accept(OR)) {
+				instrument = new Instrument(new Or(), instrument, eqExp());
+			}
+		}
+		return instrument;
+	}
 	
-	private void checkExpression(Instrument instrument) throws Exception {
-		IFun fun = instrument.getFun();
-		if (fun instanceof Assign || fun instanceof DefFun)
-			throw new Exception(fun.getName() + " cann't occured in arithmetic expression");
+	private Instrument eqExp() throws Exception {
+		Instrument instrument = relExp();
+		while (tokenizer.peek(EQ) || tokenizer.peek(NE)) {
+			if (tokenizer.accept(EQ)) {
+				instrument = new Instrument(new EQ(), instrument, relExp());
+			} else if (tokenizer.accept(NE)) {
+				instrument = new Instrument(new NE(), instrument, relExp());
+			}
+		}
+		return instrument;
+	}
+	
+	private Instrument relExp() throws Exception {
+		Instrument instrument = addSubExp();
+		while (tokenizer.peek(LT) || tokenizer.peek(LTE)
+				|| tokenizer.peek(GT) || tokenizer.peek(GTE)) {
+			if (tokenizer.accept(LT)) {
+				instrument = new Instrument(new LT(), instrument, addSubExp());
+			} else if (tokenizer.accept(LTE)) {
+				instrument = new Instrument(new LTE(), instrument, addSubExp());
+			} else if (tokenizer.accept(GT)) {
+				instrument = new Instrument(new GT(), instrument, addSubExp());
+			} else if (tokenizer.accept(GTE)) {
+				instrument = new Instrument(new GTE(), instrument, addSubExp());
+			}
+		}
+		return instrument;
 	}
 	
 	private Instrument addSubExp() throws Exception {
-		Instrument instrument = multiExp();
+		Instrument instrument = multiDivExp();
 		while (tokenizer.peek(ADD) || tokenizer.peek(SUB)) {
 			if (tokenizer.accept(ADD)) {
-				Instrument multiInstrument = multiExp();
-				checkExpression(multiInstrument);
-				
-				Instrument addInstrument = new Instrument(new Add(), instrument, multiInstrument);
-				instrument = addInstrument;
+				instrument = new Instrument(new Add(), instrument, multiDivExp());
 			} else if (tokenizer.accept(SUB)) {
-				Instrument multiInstrument = multiExp();
-				checkExpression(multiInstrument);
-				
-				Instrument addInstrument = new Instrument(new Sub(), instrument, multiInstrument);
-				instrument = addInstrument;
+				instrument = new Instrument(new Sub(), instrument, multiDivExp());
 			}
 		}
 		
 		return instrument;
 	}
 	
-	private Instrument multiExp() throws Exception {
+	private Instrument multiDivExp() throws Exception {
 		Instrument instrument = valueExp();
-		while (tokenizer.accept(MULTI)) {
-			Instrument valueInstrument = valueExp();
-			checkExpression(valueInstrument);
-			
-			Instrument multiInstrument = new Instrument(new Multi(), instrument, valueInstrument);
-			instrument = multiInstrument;
+		while (tokenizer.peek(MULTI) || tokenizer.peek(DIV)) {
+			if (tokenizer.accept(MULTI)) {
+				instrument = new Instrument(new Multi(), instrument, valueExp());
+			} else if (tokenizer.accept(DIV)){
+				instrument = new Instrument(new Div(), instrument, valueExp());
+			}
 		}
 		
 		return instrument;
@@ -97,7 +137,9 @@ public class Parser {
 			}
 			
 			return instrument;
-		} else if (tokenizer.peek(IDENTIFIER)) {
+		} else if (tokenizer.peek(IDENTIFIER) 
+				|| tokenizer.peek(ADD) || tokenizer.peek(SUB)
+				|| tokenizer.peek(MULTI) || tokenizer.peek(DIV)) {
 			Instrument instrument = null;
 			Token token = tokenizer.nextToken();
 			if (tokenizer.accept(ASSIGN)) {
@@ -117,7 +159,7 @@ public class Parser {
 				List<String> parameters = new ArrayList<String>();
 				if (tokenizer.peek(CLOSE_PARENTHESIS) == false) {
 					parameters.add(tokenizer.expect(IDENTIFIER).getStr());
-					while (tokenizer.accept(DOT)) {
+					while (tokenizer.accept(COMMA)) {
 						parameters.add(tokenizer.expect(IDENTIFIER).getStr());
 					}
 				}
@@ -144,12 +186,63 @@ public class Parser {
 			}
 			
 			return instrument;
-		} else if (tokenizer.peek(INTEGER)) {
+		} else if (tokenizer.peek(IF) || tokenizer.peek(ELIF) || tokenizer.peek(ELSE)) {
 			Token token = tokenizer.nextToken();
-			return new Instrument(new Value(), new Integer(java.lang.Integer.parseInt(token.getStr())));
+			Instrument condition = null;
+			Instrument falseInstrument = null;
+			
+			if (token.getTokenType() == ELSE) {
+				condition = new Instrument(new Value(), Boolean.True);
+			} else {
+				tokenizer.expect(OPEN_PARENTHESIS);
+				condition = expression();
+				tokenizer.expect(CLOSE_PARENTHESIS);
+			}
+			
+			List<Instrument> trueInstruments = new ArrayList<Instrument>();
+			if (tokenizer.accept(OPEN_BRACE)) {
+				while (tokenizer.peek(CLOSE_BRACE) == false) {
+					trueInstruments.add(expression());
+				}
+				tokenizer.expect(CLOSE_BRACE);
+			} else {
+				trueInstruments.add(expression());
+			}
+			
+			if (token.getTokenType() != ELSE && (tokenizer.peek(ELSE) || tokenizer.peek(ELIF))) {
+				falseInstrument = expression();
+			}
+			
+			return new Instrument(new Cond(trueInstruments, falseInstrument), condition);
+		} else if (tokenizer.accept(WHILE)) {
+			tokenizer.expect(OPEN_PARENTHESIS);
+			Instrument condition = expression();
+			tokenizer.expect(CLOSE_PARENTHESIS);
+			
+			List<Instrument> trueInstruments = new ArrayList<Instrument>();
+			if (tokenizer.accept(OPEN_BRACE)) {
+				while (tokenizer.peek(CLOSE_BRACE) == false) {
+					trueInstruments.add(expression());
+				}
+				tokenizer.expect(CLOSE_BRACE);
+			} else {
+				trueInstruments.add(expression());
+			}
+			
+			return new Instrument(new While(trueInstruments), condition);
+		} else if (tokenizer.accept(BREAK)) {
+			return new Instrument(new Break());
+		} else if (tokenizer.accept(RETURN)) {
+			return new Instrument(new Return());
+		} else if (tokenizer.peek(BOOLEAN)) {
+			Token token = tokenizer.nextToken();
+			return new Instrument(new Value(), Boolean.valueOf(token.getStr()));
+		} else if (tokenizer.peek(NUMBER)) {
+			Token token = tokenizer.nextToken();
+			return new Instrument(new Number(), token.getStr());
 		}
 		
-		if (tokenizer.hasNext())
+		if (tokenizer.hasNext() == false)
 			throw new Exception("unexpected EOF");
 		throw new Exception("unexpected token: " + tokenizer.nextToken());
 	}
@@ -159,7 +252,7 @@ public class Parser {
 		List<Object> arguments = new ArrayList<Object>();
 		if (tokenizer.peek(CLOSE_PARENTHESIS) == false) {
 			arguments.add(expression());
-			while (tokenizer.accept(DOT)) {
+			while (tokenizer.accept(COMMA)) {
 				arguments.add(expression());
 			}
 		}

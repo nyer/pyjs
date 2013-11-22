@@ -2,14 +2,44 @@ package org.nyer.pyjs;
 
 public enum TokenType {
 	DOT,
+	COMMA,
+
+	ASSIGN,
 	OPEN_PARENTHESIS,
 	CLOSE_PARENTHESIS,
-	IDENTIFIER,
-	ASSIGN,
+	
+	OPEN_BRACE,
+	CLOSE_BRACE,
+	
+	OR,
+	AND,
+	
+	EQ,
+	NE,
+	
+	GT,
+	GTE,
+	LT,
+	LTE,
+	
 	ADD,
 	SUB,
 	MULTI,
-	INTEGER,
-	OPEN_BRACE,
-	CLOSE_BRACE;
+	DIV,
+	
+	NUMBER,
+	BOOLEAN,
+	
+	IF,
+	ELSE,
+	ELIF,
+	
+	BREAK,
+	RETURN,
+	WHILE,
+	FOR,
+
+	IDENTIFIER,
+	
+	UNKNOW,
 }

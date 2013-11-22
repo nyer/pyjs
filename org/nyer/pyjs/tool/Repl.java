@@ -12,7 +12,7 @@ public class Repl {
 		while (in.hasNext()) {
 			String line = in.nextLine();
 			try {
-				System.out.println(interpreter.run(line));
+				System.out.println("<< " + interpreter.run(line));
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}

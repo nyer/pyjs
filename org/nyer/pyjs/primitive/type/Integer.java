@@ -1,4 +1,4 @@
-package org.nyer.pyjs.primitive;
+package org.nyer.pyjs.primitive.type;
 
 public class Integer {
 	private int value;
@@ -12,6 +12,6 @@ public class Integer {
 	
 	@Override
 	public String toString() {
-		return "Integer: " + value;
+		return String.valueOf(value);
 	}
 }

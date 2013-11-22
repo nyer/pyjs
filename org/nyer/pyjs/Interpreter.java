@@ -9,6 +9,10 @@ import java.util.List;
 
 import org.nyer.pyjs.primitive.Instrument;
 import org.nyer.pyjs.primitive.Println;
+import org.nyer.pyjs.primitive.operator.Add;
+import org.nyer.pyjs.primitive.operator.Div;
+import org.nyer.pyjs.primitive.operator.Multi;
+import org.nyer.pyjs.primitive.operator.Sub;
 
 
 public class Interpreter {
@@ -16,7 +20,15 @@ public class Interpreter {
 	private Parser parser = new Parser();
 	
 	public Interpreter() {
-		env.put("println", new Println());
+		init();
+	}
+	
+	private void init() {
+		env.put(new Add());
+		env.put(new Sub());
+		env.put(new Div());
+		env.put(new Multi());
+		env.put(new Println());
 	}
 	
 	public List<Instrument> parse(String code) throws Exception {

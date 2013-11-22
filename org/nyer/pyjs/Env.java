@@ -20,9 +20,13 @@ public class Env {
 		map.put(identifier, value);
 	}
 	
+	public void put(IFun fun) {
+		map.put(fun.getName(), fun);
+	}
+	
 	public Env extend(String[] identifiers, Object[] values) {
 		Env env = new Env(this);
-		env.map = new HashMap<String, Object>(map);
+		env.map = new HashMap<String, Object>();
 		if (identifiers != null) {
 			for (int i = 0, s = identifiers.length;i < s;i ++) {
 				env.put(identifiers[i], values[i]);

@@ -1,7 +1,8 @@
-package org.nyer.pyjs.primitive;
+package org.nyer.pyjs.primitive.operator;
 
 import org.nyer.pyjs.AbstractFun;
 import org.nyer.pyjs.Env;
+import org.nyer.pyjs.primitive.Identifier;
 
 public class Assign extends AbstractFun {
 	public Assign() {

@@ -1,4 +1,4 @@
-package org.nyer.pyjs.primitive;
+package org.nyer.pyjs.primitive.type;
 
 public class Void {
 	@Override

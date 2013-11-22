@@ -2,6 +2,7 @@ package org.nyer.pyjs.primitive;
 
 import org.nyer.pyjs.AbstractFun;
 import org.nyer.pyjs.Env;
+import org.nyer.pyjs.primitive.type.Void;
 
 public class Println extends AbstractFun{
 	public Println() {
