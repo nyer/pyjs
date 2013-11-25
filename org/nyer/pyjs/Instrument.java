@@ -1,10 +1,8 @@
-package org.nyer.pyjs.primitive;
+package org.nyer.pyjs;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nyer.pyjs.Env;
-import org.nyer.pyjs.IFun;
 
 public class Instrument {
 	private IFun fun;

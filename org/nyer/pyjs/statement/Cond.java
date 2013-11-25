@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
-import org.nyer.pyjs.primitive.Instrument;
+import org.nyer.pyjs.Instrument;
 import org.nyer.pyjs.primitive.operator.ValueOp;
 import org.nyer.pyjs.primitive.type.Void;
 

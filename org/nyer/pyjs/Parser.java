@@ -9,7 +9,6 @@ import org.nyer.pyjs.primitive.ArrayMapVisitor;
 import org.nyer.pyjs.primitive.DefFun;
 import org.nyer.pyjs.primitive.FunCall;
 import org.nyer.pyjs.primitive.Identifier;
-import org.nyer.pyjs.primitive.Instrument;
 import org.nyer.pyjs.primitive.operator.Add;
 import org.nyer.pyjs.primitive.operator.And;
 import org.nyer.pyjs.primitive.operator.Assign;
@@ -295,10 +294,9 @@ public class Parser {
 					}
 				}
 			}
-		}
-		
-		if (instrument != null)
+			
 			return instrument;
+		}
 		
 		if (tokenizer.hasNext() == false)
 			throw new Exception("unexpected EOF");

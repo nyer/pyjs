@@ -26,7 +26,7 @@ public abstract class Value extends AbstractFun {
 	@Override
 	public String toString() {
 		try {
-			return getTypeStr(null) + ": " + getValue();
+			return "" + getValue();
 		} catch (Exception e) {
 		}
 		return "";

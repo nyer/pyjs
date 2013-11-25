@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
+import org.nyer.pyjs.Instrument;
 import org.nyer.pyjs.primitive.type.Void;
 import org.nyer.pyjs.statement.Return;
 
