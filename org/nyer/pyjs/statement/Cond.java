@@ -1,13 +1,16 @@
-package org.nyer.pyjs.primitive;
+package org.nyer.pyjs.statement;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.nyer.pyjs.Env;
+import org.nyer.pyjs.primitive.AbstractFun;
+import org.nyer.pyjs.primitive.Instrument;
+import org.nyer.pyjs.primitive.operator.ValueOp;
 import org.nyer.pyjs.primitive.type.Boolean;
 import org.nyer.pyjs.primitive.type.Void;
 
-public class Cond extends ControlFun {
+public class Cond extends ValueOp {
 	private List<Instrument> trueInstruments;
 	private Instrument falseInstrument;
 	public Cond(List<Instrument> trueInstruments, Instrument falseInstrument) {
@@ -18,20 +21,9 @@ public class Cond extends ControlFun {
 
 	@Override
 	public Object invoke(Env env, Object[] arguments) throws Exception {
-		if (arguments == null || arguments.length == 0)
-			throw new Exception("a boolean expression expected");
-		if (arguments.length > 1)
-			throw new Exception("a boolean expression expected, but found: " + Arrays.toString(arguments));
-		
-		Object arg = arguments[0];
-		Object value = toValue(env, arg);
-		
-		if (value instanceof Boolean == false)
-			throw new Exception("Boolean exepected, but found: " + value);
-
+		boolean condition = checkBoolOperand(env, arguments[0]);
 		Object ret = new Void();
-		Boolean b = (Boolean) value;
-		if (b.getValue() == true) {
+		if (condition) {
 			for (int i = 0, s = trueInstruments.size();i < s;i ++) {
 				ret = trueInstruments.get(i).invoke(env);
 			}
@@ -40,5 +32,9 @@ public class Cond extends ControlFun {
 		}
 		
 		return ret;
+	}
+	
+	public void setFalseInstrument(Instrument instrument) {
+		this.falseInstrument = instrument;
 	}
 }

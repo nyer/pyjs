@@ -1,17 +1,21 @@
 package org.nyer.pyjs.primitive;
 
-public class Identifier {
-	private String name;
-	public Identifier(String name) {
-		this.name = name;
-	}
-	
-	public String getName() {
-		return name;
+import org.nyer.pyjs.Env;
+import org.nyer.pyjs.primitive.type.Value;
+
+public class Identifier extends Value {
+
+	public Identifier(String value) {
+		super("identifier","identifier",  value);
 	}
 
 	@Override
-	public String toString() {
-		return "Identifier [name=" + name + "]";
+	public Object invoke(Env env, Object[] arguments) throws Exception {
+		String name = (String) getValue();
+		Object arg = env.lookUp(name);
+		if (arg == null)
+			throw new Exception("undefined identifier,  " + name);
+		
+		return arg;
 	}
 }

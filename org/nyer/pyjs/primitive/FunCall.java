@@ -1,6 +1,5 @@
 package org.nyer.pyjs.primitive;
 
-import org.nyer.pyjs.AbstractFun;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 
@@ -12,7 +11,7 @@ public class FunCall extends AbstractFun {
 
 	@Override
 	public Object invoke(Env env, Object[] arguments) throws Exception {
-		Object obj = env.lookUp(new Identifier(getName()));
+		Object obj = env.lookUp(getName());
 		if (obj == null)
 			throw new Exception("function " + getName() + " undefined");
 		if (obj instanceof IFun == false)

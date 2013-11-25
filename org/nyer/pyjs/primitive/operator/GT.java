@@ -1,11 +1,8 @@
 package org.nyer.pyjs.primitive.operator;
 
 import org.nyer.pyjs.Env;
-import org.nyer.pyjs.primitive.type.Boolean;
-import org.nyer.pyjs.primitive.type.Float;
-import org.nyer.pyjs.primitive.type.Integer;
 
-public class GT extends NumberOp {
+public class GT extends ValueOp {
 
 	public GT() {
 		super(">", new String[] {"number", "number"});
@@ -16,30 +13,31 @@ public class GT extends NumberOp {
 		Object arg1 = arguments[0];
 		Object arg2 = arguments[1];
 		
-		Object op1 = checkOperand(env, arg1);
+		Object op1 = checkNumOperand(env, arg1);
 		
-		Object op2 = checkOperand(env, arg2);
+		Object op2 = checkNumOperand(env, arg2);
 		
 		if (op1 instanceof Integer && op2 instanceof Integer) {
-			Integer int1 = (Integer) op1;
-			Integer int2 = (Integer) op2;
+			Integer v1 = (Integer) op1;
+			Integer v2 = (Integer) op2;
 			
-			return Boolean.valueOf(int1.getValue() > int2.getValue());
+			return org.nyer.pyjs.primitive.type.Boolean.valueOf(v1 > v2);
 		} else {
 			if (op1 instanceof Float && op2 instanceof Float) {
-				Float float1 = (Float) op1;
-				Float float2 = (Float) op2;
-				
-				return Boolean.valueOf(float1.getValue() > float2.getValue());
-			} else if (op1 instanceof Float) {
-				Float float1 = (Float) op1;
-				Integer int2 = (Integer) op2;
+				Float v1 = (Float) op1;
+				Float v2 = (Float) op2;
 
-				return Boolean.valueOf(float1.getValue() > int2.getValue());
+				return org.nyer.pyjs.primitive.type.Boolean.valueOf(v1 > v2);
+			} else if (op1 instanceof Float) {
+				Float v1 = (Float) op1;
+				Integer v2 = (Integer) op2;
+
+				return org.nyer.pyjs.primitive.type.Boolean.valueOf(v1 > v2);
 			} else {
-				Integer int1 = (Integer) op1;
-				Float float2 = (Float) op2;
-				return Boolean.valueOf(int1.getValue() > float2.getValue());
+				Integer v1 = (Integer) op1;
+				Float v2 = (Float) op2;
+				
+				return org.nyer.pyjs.primitive.type.Boolean.valueOf(v1 > v2);
 			}
 		}
 	}

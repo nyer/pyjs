@@ -36,8 +36,8 @@ public class Env {
 		return env;
 	}
 	
-	public Object lookUp(Identifier identifier) {
-		Object v = map.get(identifier.getName());
+	public Object lookUp(String identifier) {
+		Object v = map.get(identifier);
 		if (v == null && this.parent != null)
 			return this.parent.lookUp(identifier);
 		else

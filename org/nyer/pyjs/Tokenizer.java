@@ -27,7 +27,7 @@ public class Tokenizer {
 	private void removePrefixSpaceChar() {
 		if (code.length() > 0) {
 			char ch = code.charAt(0);
-			while (ch == ' ' || ch == '\t' || ch == '\b'  || ch == '\r' || ch == ';') {
+			while (ch == ' ' || ch == '\t' || ch == '\b'  || ch == '\r') {
 				code.deleteCharAt(0);
 
 				if (code.length() == 0)
@@ -60,8 +60,10 @@ public class Tokenizer {
 				} while (code.length() > 0);
 				if (tokenStr.equals("."))
 					type = DOT;
+				else if (dotExist)
+					type = FLOAT;
 				else
-					type = NUMBER;
+					type = INTEGER;
 			} else if (ch == '+') {
 				tokenStr.append(ch);
 				type = ADD;
@@ -73,6 +75,10 @@ public class Tokenizer {
 			} else if (ch == ',') {
 				tokenStr.append(ch);
 				type = COMMA;
+				code.deleteCharAt(0);
+			} else if (ch == ';') {
+				tokenStr.append(ch);
+				type = SEMICOLON;
 				code.deleteCharAt(0);
 			} else if (ch == '*') {
 				tokenStr.append(ch);
@@ -222,6 +228,11 @@ public class Tokenizer {
 	
 	public boolean hasNext() {
 		return tokens.size() > 0;
+	}
+	
+	public void cleanSemiColon() throws Exception {
+		while (peek(SEMICOLON))
+			nextToken();
 	}
 	
 	public static void main(String[] args) {

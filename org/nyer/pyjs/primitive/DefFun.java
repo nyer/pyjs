@@ -1,12 +1,10 @@
-package org.nyer.pyjs;
+package org.nyer.pyjs.primitive;
 
 import java.util.List;
 
-import org.nyer.pyjs.primitive.ControlFun;
-import org.nyer.pyjs.primitive.Instrument;
-import org.nyer.pyjs.primitive.Return;
-import org.nyer.pyjs.primitive.type.ReturnResult;
+import org.nyer.pyjs.Env;
 import org.nyer.pyjs.primitive.type.Void;
+import org.nyer.pyjs.statement.Return;
 
 public class DefFun extends AbstractFun {
 	protected List<Instrument> instruments;
@@ -26,18 +24,10 @@ public class DefFun extends AbstractFun {
 				List<Instrument> instruments = DefFun.this.instruments;
 				for (int i = 0, s = instruments.size();i < s;i ++) {
 					Instrument instrument = instruments.get(i);
-					if (instrument.getFun() instanceof Return) {
-						Object returnV = new Void();
-						i = i + 1;
-						if (i < s) {
-							instrument = instruments.get(i);
-							if (instrument.getFun() instanceof ControlFun == false)
-								returnV = instrument.invoke(env);
-						}
-						return returnV;
-					}
-					
 					ret = instrument.invoke(env);
+					if (instrument.getFun() instanceof Return) {
+						return ret;
+					}
 				}
 				return ret;
 			}

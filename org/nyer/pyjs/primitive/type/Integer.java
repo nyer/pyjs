@@ -1,17 +1,13 @@
 package org.nyer.pyjs.primitive.type;
 
-public class Integer {
-	private int value;
+
+public class Integer extends Value  {
+
 	public Integer(int value) {
-		this.value = value;
+		super("integer", "integer str", value);
 	}
-	
-	public int getValue() {
-		return value;
-	}
-	
-	@Override
-	public String toString() {
-		return String.valueOf(value);
+
+	public static Integer valueOf(final int v) {
+		return new Integer(v);
 	}
 }

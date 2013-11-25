@@ -1,8 +1,8 @@
 package org.nyer.pyjs.primitive.type;
 
-public class Void {
-	@Override
-	public String toString() {
-		return "Void";
+public class Void extends Value {
+
+	public Void() {
+		super("void", null, null);
 	}
 }

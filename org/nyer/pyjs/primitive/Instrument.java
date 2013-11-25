@@ -27,4 +27,8 @@ public class Instrument {
 	public IFun getFun() {
 		return fun;
 	}
+	
+	public Object[] getArguments() {
+		return arguments;
+	}
 }

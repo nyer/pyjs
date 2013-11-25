@@ -3,6 +3,7 @@ package org.nyer.pyjs;
 public enum TokenType {
 	DOT,
 	COMMA,
+	SEMICOLON,
 
 	ASSIGN,
 	OPEN_PARENTHESIS,
@@ -27,7 +28,8 @@ public enum TokenType {
 	MULTI,
 	DIV,
 	
-	NUMBER,
+	FLOAT,
+	INTEGER, 
 	BOOLEAN,
 	
 	IF,

@@ -1,18 +1,14 @@
 package org.nyer.pyjs.primitive.type;
 
-public class Float {
-	private float value;
-	
+
+
+public class Float extends Value {
+
 	public Float(float value) {
-		this.value = value;
-	}
-	
-	public float getValue() {
-		return value;
+		super("float", "float str", value);
 	}
 
-	@Override
-	public String toString() {
-		return String.valueOf(value);
+	public static Float valueOf(final float v) {
+		return new Float(v);
 	}
 }

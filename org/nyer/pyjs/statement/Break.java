@@ -1,8 +1,9 @@
-package org.nyer.pyjs.primitive;
+package org.nyer.pyjs.statement;
 
 import org.nyer.pyjs.Env;
+import org.nyer.pyjs.primitive.AbstractFun;
 
-public class Break extends ControlFun {
+public class Break extends AbstractFun {
 
 	public Break() {
 		super("break", new String[]{});
