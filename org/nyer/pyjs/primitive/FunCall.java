@@ -1,23 +1,22 @@
 package org.nyer.pyjs.primitive;
 
+import java.util.List;
+
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
+import org.nyer.pyjs.primitive.type.Value;
 
 public class FunCall extends AbstractFun {
-
-	public FunCall(String name) {
-		super(name, null);
+	public FunCall() {
+		super(null);
 	}
 
 	@Override
-	public Object invoke(Env env, Object[] arguments) throws Exception {
-		Object obj = env.lookUp(getName());
-		if (obj == null)
-			throw new Exception("function " + getName() + " undefined");
-		if (obj instanceof IFun == false)
-			throw new Exception("a function expected, but " + obj + " founded");
+	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
+		IFun func = arguments.get(0);
+		if (func instanceof Value)
+			throw new Exception("value cannot be invoked, " + func);
 		
-		IFun fun = (IFun) obj;
-		return fun.invoke(env, arguments);
+		return func.invoke(env, arguments.subList(1, arguments.size()));
 	}
 }

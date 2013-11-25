@@ -1,12 +1,11 @@
 package org.nyer.pyjs;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.nyer.pyjs.primitive.Identifier;
-
 public class Env {
-	private Map<String, Object> map = new HashMap<String, Object>();
+	private Map<String, IFun> map = new HashMap<String, IFun>();
 	protected Env parent = null;
 	
 	public Env() {
@@ -16,28 +15,24 @@ public class Env {
 		this.parent = parent;
 	}
 	
-	public void put(String identifier, Object value) {
+	public void put(String identifier, IFun value) {
 		map.put(identifier, value);
 	}
 	
-	public void put(IFun fun) {
-		map.put(fun.getName(), fun);
-	}
-	
-	public Env extend(String[] identifiers, Object[] values) {
+	public Env extend(String[] identifiers, List<IFun> values) {
 		Env env = new Env(this);
-		env.map = new HashMap<String, Object>();
+		env.map = new HashMap<String, IFun>();
 		if (identifiers != null) {
 			for (int i = 0, s = identifiers.length;i < s;i ++) {
-				env.put(identifiers[i], values[i]);
+				env.put(identifiers[i], values.get(i));
 			}
 		}
 		
 		return env;
 	}
 	
-	public Object lookUp(String identifier) {
-		Object v = map.get(identifier);
+	public IFun lookUp(String identifier) {
+		IFun v = map.get(identifier);
 		if (v == null && this.parent != null)
 			return this.parent.lookUp(identifier);
 		else

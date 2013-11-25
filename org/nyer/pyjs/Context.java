@@ -4,6 +4,10 @@ public class Context {
 	private boolean allowBreak = false;
 	private boolean allowReturn = false;
 	
+	public boolean inFunc() {
+		return allowReturn = true;
+	}
+	
 	public void enterFunc() {
 		allowReturn = true;
 		allowBreak = false;

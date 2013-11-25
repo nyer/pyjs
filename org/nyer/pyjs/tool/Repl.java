@@ -2,7 +2,7 @@ package org.nyer.pyjs.tool;
 
 import java.util.Scanner;
 
-import org.nyer.pyjs.Interpreter;
+import org.nyer.pyjs.interpreter.Interpreter;
 
 public class Repl {
 	public static void main(String[] args) {

@@ -1,18 +1,22 @@
 package org.nyer.pyjs.primitive;
 
+import java.util.List;
+
 import org.nyer.pyjs.Env;
-import org.nyer.pyjs.primitive.operator.ValueOp;
+import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.Void;
 
-public class Println extends ValueOp{
+public class Println extends AbstractFun {
 	public Println() {
-		super("println", new String[] {"op1"});
+		super(new String[] {"op1"});
 	}
 	
 	@Override
-	public Object invoke(Env env, Object[] arguments) throws Exception {
-		Object obj = eval(env, arguments[0]);
-		System.out.println(obj);
+	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
+		if (arguments.size() > 0)
+			System.out.println(arguments.get(0));
+		else
+			System.out.println();
 		return new Void();
 	}
 }

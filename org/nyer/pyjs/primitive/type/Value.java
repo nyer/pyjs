@@ -1,19 +1,22 @@
 package org.nyer.pyjs.primitive.type;
 
+import java.util.List;
+
 import org.nyer.pyjs.Env;
+import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.AbstractFun;
 
 public abstract class Value extends AbstractFun {
-	private Object value;
+	protected Object value;
 	
-	public Value(String name, String parameter, Object value) {
-		super(name, new String[] {parameter});
+	public Value(String parameter, Object value) {
+		super(new String[] {parameter});
 		this.value = value;
 	}
 	
 	@Override
-	public Object invoke(Env env, Object[] arguments) throws Exception {
-		return value;
+	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
+		return this;
 	}
 	
 	public Object getValue() {
@@ -21,7 +24,36 @@ public abstract class Value extends AbstractFun {
 	}
 	
 	@Override
-	public java.lang.String toString() {
-		return "type: " + getName() + ", value: " + getValue();
+	public String toString() {
+		try {
+			return getTypeStr(null) + ": " + getValue();
+		} catch (Exception e) {
+		}
+		return "";
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Value other = (Value) obj;
+		if (value == null) {
+			if (other.value != null)
+				return false;
+		} else if (!value.equals(other.value))
+			return false;
+		return true;
 	}
 }

@@ -4,6 +4,7 @@ public enum TokenType {
 	DOT,
 	COMMA,
 	SEMICOLON,
+	COLON,
 
 	ASSIGN,
 	OPEN_PARENTHESIS,
@@ -11,6 +12,9 @@ public enum TokenType {
 	
 	OPEN_BRACE,
 	CLOSE_BRACE,
+	
+	OPEN_BRACKET,
+	CLOSE_BRACKET,
 	
 	OR,
 	AND,
@@ -31,6 +35,7 @@ public enum TokenType {
 	FLOAT,
 	INTEGER, 
 	BOOLEAN,
+	STRING,
 	
 	IF,
 	ELSE,

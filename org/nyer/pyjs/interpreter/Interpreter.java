@@ -1,4 +1,4 @@
-package org.nyer.pyjs;
+package org.nyer.pyjs.interpreter;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import org.nyer.pyjs.Env;
+import org.nyer.pyjs.Parser;
 import org.nyer.pyjs.primitive.Instrument;
 import org.nyer.pyjs.primitive.Println;
 import org.nyer.pyjs.primitive.operator.Add;
@@ -24,11 +26,11 @@ public class Interpreter {
 	}
 	
 	private void init() {
-		env.put(new Add());
-		env.put(new Sub());
-		env.put(new Div());
-		env.put(new Multi());
-		env.put(new Println());
+		env.put("+", new Add());
+		env.put("-", new Sub());
+		env.put("/", new Div());
+		env.put("*", new Multi());
+		env.put("println", new Println());
 	}
 	
 	public List<Instrument> parse(String code) throws Exception {
@@ -36,6 +38,7 @@ public class Interpreter {
 	}
 	
 	public Object run(List<Instrument> instruments) throws Exception {
+		InterpretContext context = new InterpretContext();
 		Object ret = null;
 		for (Instrument instrument : instruments) {
 			ret = instrument.invoke(env);

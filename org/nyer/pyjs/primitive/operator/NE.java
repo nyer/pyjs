@@ -1,22 +1,23 @@
 package org.nyer.pyjs.primitive.operator;
 
+import java.util.List;
+
 import org.nyer.pyjs.Env;
-import org.nyer.pyjs.primitive.type.Boolean;
-import org.nyer.pyjs.primitive.type.Float;
-import org.nyer.pyjs.primitive.type.Integer;
+import org.nyer.pyjs.IFun;
+import org.nyer.pyjs.primitive.type.PjBoolean;
 
 public class NE extends ValueOp {
 
 	public NE() {
-		super("!=", new String[] {"number", "number"});
+		super(new String[] {"number", "number"});
 	}
 
 	@Override
-	public Object invoke(Env env, Object[] arguments) throws Exception {
+	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
 		EQ eq = new EQ();
-		boolean v = (java.lang.Boolean) eq.invoke(env, arguments);
+		boolean v = checkBoolOperand(env, eq.invoke(env, arguments)) ;
 		if (v)
-			return Boolean.False;
-		return Boolean.True;
+			return PjBoolean.False;
+		return PjBoolean.True;
 	}
 }

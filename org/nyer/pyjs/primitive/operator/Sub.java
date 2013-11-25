@@ -1,42 +1,43 @@
 package org.nyer.pyjs.primitive.operator;
 
+import java.util.List;
+
 import org.nyer.pyjs.Env;
+import org.nyer.pyjs.IFun;
+import org.nyer.pyjs.primitive.type.PjFloat;
+import org.nyer.pyjs.primitive.type.PjInteger;
 
 public class Sub extends ValueOp {
 	public Sub() {
-		super("-", new String[] {"op1", "op2"});
+		super(new String[] {"op1", "op2"});
 	}
 	
 	@Override
-	public Object invoke(Env env, Object[] arguments) throws Exception {
-		Object arg1 = arguments[0];
-		Object arg2 = arguments[1];
-		
-		Object op1 = checkNumOperand(env, arg1);
-		
-		Object op2 = checkNumOperand(env, arg2);
+	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
+		Number op1 = checkNumOperand(env, arguments.get(0));
+		Number op2 = checkNumOperand(env, arguments.get(1));
 		
 		if (op1 instanceof Integer && op2 instanceof Integer) {
 			Integer v1 = (Integer) op1;
 			Integer v2 = (Integer) op2;
 			
-			return org.nyer.pyjs.primitive.type.Integer.valueOf(v1 - v2);
+			return PjInteger.valueOf(v1 - v2);
 		} else {
 			if (op1 instanceof Float && op2 instanceof Float) {
 				Float v1 = (Float) op1;
 				Float v2 = (Float) op2;
 
-				return org.nyer.pyjs.primitive.type.Float.valueOf(v1 - v2);
+				return PjFloat.valueOf(v1 - v2);
 			} else if (op1 instanceof Float) {
 				Float v1 = (Float) op1;
 				Integer v2 = (Integer) op2;
 
-				return org.nyer.pyjs.primitive.type.Float.valueOf(v1 - v2);
+				return PjFloat.valueOf(v1 - v2);
 			} else {
 				Integer v1 = (Integer) op1;
 				Float v2 = (Float) op2;
 				
-				return org.nyer.pyjs.primitive.type.Float.valueOf(v1 - v2);
+				return PjFloat.valueOf(v1 - v2);
 			}
 		}
 	}

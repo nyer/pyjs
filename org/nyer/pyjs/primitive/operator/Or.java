@@ -1,23 +1,27 @@
 package org.nyer.pyjs.primitive.operator;
 
+import java.util.List;
+
 import org.nyer.pyjs.Env;
+import org.nyer.pyjs.IFun;
+import org.nyer.pyjs.primitive.type.PjBoolean;
 
 public class Or extends ValueOp {
 
 	public Or() {
-		super("||", new String[] {"boolean", "boolean"});
+		super(new String[] {"boolean", "boolean"});
 	}
 
 	@Override
-	public Object invoke(Env env, Object[] arguments) throws Exception {
-		boolean v = checkBoolOperand(env, arguments[0]);
+	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
+		boolean v = checkBoolOperand(env, arguments.get(0));
 		if (v == false) {
-			v = checkBoolOperand(env, arguments[1]);
+			v = checkBoolOperand(env, arguments.get(1));
 			if (v == false) {
-				return org.nyer.pyjs.primitive.type.Boolean.False;
+				return PjBoolean.False;
 			}
 		}
-		return org.nyer.pyjs.primitive.type.Boolean.True;
+		return PjBoolean.True;
 	}
 
 }

@@ -13,7 +13,7 @@ public class Tokenizer {
 		tokens = tokenize();
 	}
 	
-	public List<Token> tokenize() {
+	private List<Token> tokenize() {
 		List<Token> tokens = new ArrayList<Token>();
 		Token token = next();
 		while (token != null) {
@@ -42,7 +42,7 @@ public class Tokenizer {
 		
 		if (code.length() > 0) {
 			Token token = null;
-			TokenType type;
+			TokenType type = UNKNOW;;
 			StringBuilder tokenStr = new StringBuilder();
 			char ch = code.charAt(0);
 			if (Character.isDigit(ch) || ch == '.') {
@@ -80,10 +80,32 @@ public class Tokenizer {
 				tokenStr.append(ch);
 				type = SEMICOLON;
 				code.deleteCharAt(0);
+			} else if (ch == ':') {
+				tokenStr.append(ch);
+				type = COLON;
+				code.deleteCharAt(0);
 			} else if (ch == '*') {
 				tokenStr.append(ch);
 				type = MULTI;
 				code.deleteCharAt(0);
+			} else if (ch == '"') {
+				code.deleteCharAt(0);
+				boolean escape = false;
+				while (code.length() > 0) {
+					ch = code.charAt(0);
+					code.deleteCharAt(0);
+					if (ch == '"') {
+						if(escape == false) {
+							type = STRING;
+							break;
+						}
+					} else if (ch == '\\' && escape == false) {
+						escape = true;
+						continue;
+					}
+					escape = false;
+					tokenStr.append(ch);
+				}
 			} else if (ch == '/') {
 				tokenStr.append(ch);
 				type = DIV;
@@ -103,6 +125,14 @@ public class Tokenizer {
 			} else if (ch == '}') {
 				tokenStr.append(ch);
 				type = CLOSE_BRACE;
+				code.deleteCharAt(0);
+			} else if (ch == '[') {
+				tokenStr.append(ch);
+				type = OPEN_BRACKET;
+				code.deleteCharAt(0);
+			} else if (ch == ']') {
+				tokenStr.append(ch);
+				type = CLOSE_BRACKET;
 				code.deleteCharAt(0);
 			} else if (ch == '=') {
 				tokenStr.append(ch);
@@ -152,11 +182,12 @@ public class Tokenizer {
 			} else {
 				do {
 					ch = code.charAt(0);
-					if (Character.isLetterOrDigit(ch))
+					if (Character.isLetterOrDigit(ch)) {
 						tokenStr.append(ch);
+						code.deleteCharAt(0);
+					}
 					else
 						break;
-					code.deleteCharAt(0);
 				} while (code.length() > 0);
 				String str = tokenStr.toString();
 				if ("if".equals(str)) {
@@ -194,7 +225,7 @@ public class Tokenizer {
 			throw new Exception("unexpected EOF");
 		
 		if (peek(tokenType) == false)
-			throw new Exception("expected: " + tokenType);
+			throw new Exception("expected: " + tokenType + ", but found: " + nextToken());
 		return tokens.remove(0);
 	}
 	
@@ -235,9 +266,13 @@ public class Tokenizer {
 			nextToken();
 	}
 	
+	public List<Token> getTokens() {
+		return tokens;
+	}
+	
 	public static void main(String[] args) {
-		Tokenizer tokenizer = new Tokenizer("a = 3; b = a + 5; println(b); function() {}");
-		List<Token> tokens = tokenizer.tokenize();
+		Tokenizer tokenizer = new Tokenizer("function hello(e) {}");
+		List<Token> tokens = tokenizer.getTokens();
 		for (Token token : tokens)
 			System.out.println(token);
 	}

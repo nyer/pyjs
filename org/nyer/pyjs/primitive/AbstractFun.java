@@ -8,17 +8,10 @@ import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 
 public abstract class AbstractFun implements IFun {
-	public String name;
 	public String[] parameters;
 	
-	public AbstractFun(String name, String[] parameters) {
-		this.name = name;
+	public AbstractFun(String[] parameters) {
 		this.parameters = parameters;
-	}
-	
-	@Override
-	public String getName() {
-		return name;
 	}
 	
 	@Override
@@ -26,23 +19,19 @@ public abstract class AbstractFun implements IFun {
 		return parameters;
 	}
 	
-	protected Object[] evalArguments(Env env, Object[] arguments) throws Exception{
-		List<Object> evaledArgs = new ArrayList<Object>(arguments.length);
-		for (int i = 0, s = arguments.length;i < s;i ++) {
-			evaledArgs.add(eval(env, arguments[i]));
-		}
-		
-		return evaledArgs.toArray();
+	@Override
+	public String getTypeStr(Env env) throws Exception {
+		return "function";
 	}
 	
-	protected Object eval(Env env, Object argument) throws Exception {
-		Instrument instrument = (Instrument) argument;
-		return instrument.invoke(env);
-	}
 	
+	protected List<IFun> evalArguments(Env env, List<IFun> arguments) {
+		List<IFun> args = new ArrayList<IFun>(arguments.size());
+		return args;
+	}
 	@Override
 	public String toString() {
-		return "Function [name=" + name + ", parameters="
+		return "Function [parameters="
 				+ Arrays.toString(parameters) + "]";
 	}
 }
