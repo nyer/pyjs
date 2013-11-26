@@ -31,6 +31,7 @@ public enum TokenType {
 	SUB,
 	MULTI,
 	DIV,
+	NOT,
 	
 	FLOAT,
 	INTEGER, 

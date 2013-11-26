@@ -27,7 +27,7 @@ public class Tokenizer {
 	private void removePrefixSpaceChar() {
 		if (code.length() > 0) {
 			char ch = code.charAt(0);
-			while (ch == ' ' || ch == '\t' || ch == '\b'  || ch == '\r') {
+			while (ch == ' ' || ch == '\t' || ch == '\b'  || ch == '\r' || ch == '\n') {
 				code.deleteCharAt(0);
 
 				if (code.length() == 0)
@@ -143,6 +143,10 @@ public class Tokenizer {
 					tokenStr.append('=');
 					code.deleteCharAt(0);
 				}
+			} else if (ch == '!') {
+				tokenStr.append(ch);
+				type = NOT;
+				code.deleteCharAt(0);
 			} else if (ch == '>') {
 				tokenStr.append(ch);
 				type = GT;
@@ -247,6 +251,16 @@ public class Tokenizer {
 	public boolean peek(TokenType tokenType) throws Exception {
 		if (tokens.size() > 0 && tokens.get(0).getTokenType() == tokenType) {
 			return true;
+		}
+		return false;
+	}
+	
+	public boolean peek(TokenType... tokenTypes) throws Exception {
+		if (tokens.size() > 0) {
+			TokenType type = tokens.get(0).getTokenType();
+			for (int i = 0, s = tokenTypes.length;i < s;i ++)
+				if (tokenTypes[i] == type)
+					return true;
 		}
 		return false;
 	}

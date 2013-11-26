@@ -20,6 +20,7 @@ import org.nyer.pyjs.primitive.operator.LT;
 import org.nyer.pyjs.primitive.operator.LTE;
 import org.nyer.pyjs.primitive.operator.Multi;
 import org.nyer.pyjs.primitive.operator.NE;
+import org.nyer.pyjs.primitive.operator.Not;
 import org.nyer.pyjs.primitive.operator.Or;
 import org.nyer.pyjs.primitive.operator.Sub;
 import org.nyer.pyjs.primitive.type.PjArray;
@@ -145,7 +146,7 @@ public class Parser {
 		}
 		return instrument;
 	}
-	
+
 	private Instrument relExp() throws Exception {
 		Instrument instrument = addSubExp();
 		while (tokenizer.peek(LT) || tokenizer.peek(LTE)
@@ -177,13 +178,28 @@ public class Parser {
 	}
 	
 	private Instrument multiDivExp() throws Exception {
-		Instrument instrument = valueExp();
+		Instrument instrument = oneOperandExp();
 		while (tokenizer.peek(MULTI) || tokenizer.peek(DIV)) {
 			if (tokenizer.accept(MULTI)) {
-				instrument = new Instrument(new Multi(), instrument, valueExp());
+				instrument = new Instrument(new Multi(), instrument, oneOperandExp());
 			} else if (tokenizer.accept(DIV)){
-				instrument = new Instrument(new Div(), instrument, valueExp());
+				instrument = new Instrument(new Div(), instrument, oneOperandExp());
 			}
+		}
+		
+		return instrument;
+	}
+	
+	private Instrument oneOperandExp() throws Exception {
+		Instrument instrument = null;
+		if (tokenizer.accept(ADD)) {
+			instrument = new Instrument(new Add(), oneOperandExp());
+		} else if (tokenizer.accept(SUB)) {
+			instrument = new Instrument(new Sub(), oneOperandExp());
+		} else if (tokenizer.accept(NOT)) {
+			instrument = new Instrument(new Not(), oneOperandExp());
+		} else {
+			instrument = valueExp();
 		}
 		
 		return instrument;
@@ -228,14 +244,16 @@ public class Parser {
 				if (funName != null) {
 					instrument = new Instrument(new Assign(new Identifier(funName)), instrument);
 				}
+				
+				return instrument;
 			} else if (tokenizer.peek(OPEN_PARENTHESIS)) {
 				// a funcall
 				instrument = new Instrument(new FunCall(), 
 						new Instrument(new Identifier(token.getStr())), arguments());
-			}else {
+			} else {
 				instrument = new Instrument(new Identifier(token.getStr()));
 			}
-		}  else if (tokenizer.peek(BOOLEAN)) {
+		} else if (tokenizer.peek(BOOLEAN)) {
 			Token token = tokenizer.nextToken();
 			instrument = new Instrument(new PjBoolean(java.lang.Boolean.valueOf(token.getStr())));
 		} else if (tokenizer.peek(INTEGER)) {
