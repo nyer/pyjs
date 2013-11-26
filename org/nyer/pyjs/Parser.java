@@ -12,6 +12,7 @@ import org.nyer.pyjs.primitive.Identifier;
 import org.nyer.pyjs.primitive.operator.Add;
 import org.nyer.pyjs.primitive.operator.And;
 import org.nyer.pyjs.primitive.operator.Assign;
+import org.nyer.pyjs.primitive.operator.CondOperator;
 import org.nyer.pyjs.primitive.operator.Div;
 import org.nyer.pyjs.primitive.operator.EQ;
 import org.nyer.pyjs.primitive.operator.GT;
@@ -22,6 +23,7 @@ import org.nyer.pyjs.primitive.operator.Multi;
 import org.nyer.pyjs.primitive.operator.NE;
 import org.nyer.pyjs.primitive.operator.Not;
 import org.nyer.pyjs.primitive.operator.Or;
+import org.nyer.pyjs.primitive.operator.Parenthesis;
 import org.nyer.pyjs.primitive.operator.Sub;
 import org.nyer.pyjs.primitive.type.PjArray;
 import org.nyer.pyjs.primitive.type.PjBoolean;
@@ -199,7 +201,43 @@ public class Parser {
 		} else if (tokenizer.accept(NOT)) {
 			instrument = new Instrument(new Not(), oneOperandExp());
 		} else {
-			instrument = valueExp();
+			instrument = tailExp();
+		}
+		
+		return instrument;
+	}
+	
+	private Instrument tailExp() throws Exception {
+		Instrument instrument = valueExp();
+		if (instrument.getFun().getClass() == DefFun.class)
+			return instrument;
+		
+		if (tokenizer.peek(OPEN_BRACKET) || tokenizer.peek(OPEN_PARENTHESIS)) {
+			while (tokenizer.peek(OPEN_BRACKET) || tokenizer.peek(OPEN_PARENTHESIS)) {
+				// array or map access
+				if (tokenizer.peek(OPEN_BRACKET)) {
+					while (tokenizer.accept(OPEN_BRACKET)) {
+						Instrument posInstrument = expression();
+						tokenizer.expect(CLOSE_BRACKET);
+						
+						instrument = new Instrument(new ArrayMapVisitor(), instrument, posInstrument);
+					}
+				}
+
+				// funcall
+				if (tokenizer.peek(OPEN_PARENTHESIS)) {
+					while (tokenizer.peek(OPEN_PARENTHESIS)) {
+						instrument = new Instrument(new FunCall(), instrument, arguments());
+					}
+				}
+			}
+		}
+		
+		if (tokenizer.accept(QUESTION)) {
+			Instrument trueInstrument = expression();
+			tokenizer.expect(COLON);
+			Instrument falseInstrument = expression();
+			instrument = new Instrument(new CondOperator(trueInstrument, falseInstrument), instrument);
 		}
 		
 		return instrument;
@@ -210,6 +248,7 @@ public class Parser {
 		if (tokenizer.accept(OPEN_PARENTHESIS)) {
 			instrument = expression();
 			tokenizer.expect(CLOSE_PARENTHESIS);
+			instrument = new Instrument(new Parenthesis(), instrument);
 		} else if (tokenizer.peek(IDENTIFIER) 
 				|| tokenizer.peek(ADD) || tokenizer.peek(SUB)
 				|| tokenizer.peek(MULTI) || tokenizer.peek(DIV)) {
@@ -293,28 +332,8 @@ public class Parser {
 			instrument = new Instrument(new PjMap(), arguments);
 		}
 
-		if (instrument != null) {
-			while (tokenizer.peek(OPEN_BRACKET) || tokenizer.peek(OPEN_PARENTHESIS)) {
-				// array or map access
-				if (tokenizer.peek(OPEN_BRACKET)) {
-					while (tokenizer.accept(OPEN_BRACKET)) {
-						Instrument posInstrument = expression();
-						tokenizer.expect(CLOSE_BRACKET);
-						
-						instrument = new Instrument(new ArrayMapVisitor(), instrument, posInstrument);
-					}
-				}
-
-				// funcall
-				if (tokenizer.peek(OPEN_PARENTHESIS)) {
-					while (tokenizer.peek(OPEN_PARENTHESIS)) {
-						instrument = new Instrument(new FunCall(), instrument, arguments());
-					}
-				}
-			}
-			
+		if (instrument != null)
 			return instrument;
-		}
 		
 		if (tokenizer.hasNext() == false)
 			throw new Exception("unexpected EOF");

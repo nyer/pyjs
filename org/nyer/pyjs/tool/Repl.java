@@ -11,12 +11,14 @@ public class Repl {
 		System.out.print(">>");
 		while (in.hasNext()) {
 			String line = in.nextLine();
-			try {
-				System.out.println("<< " + interpreter.run(line));
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
+			if (line.trim().length() > 0) {
+				try {
+					System.out.println("<< " + interpreter.run(line));
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
+				}
+				System.out.print(">>");
 			}
-			System.out.print(">>");
 		}
 	}
 }

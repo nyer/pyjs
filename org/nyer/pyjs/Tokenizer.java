@@ -15,16 +15,21 @@ public class Tokenizer {
 	
 	private List<Token> tokenize() {
 		List<Token> tokens = new ArrayList<Token>();
-		Token token = next();
-		while (token != null) {
+
+		Token token = new Token();
+		removePrefixSpaceChar(token);
+		while (this.code.length() > 0) {
+			next(token);
 			tokens.add(token);
-			token = next();
+			
+			token = new Token();
+			removePrefixSpaceChar(token);
 		}
 		
 		return tokens;
 	}
 	
-	private void removePrefixSpaceChar() {
+	private void removePrefixSpaceChar(Token token) {
 		if (code.length() > 0) {
 			char ch = code.charAt(0);
 			while (ch == ' ' || ch == '\t' || ch == '\b'  || ch == '\r' || ch == '\n') {
@@ -37,191 +42,193 @@ public class Tokenizer {
 		}
 	}
 	
-	private Token next() {
-		removePrefixSpaceChar();
+	private void next(Token token) {
+		TokenType type = UNKNOW;
+		StringBuilder tokenStr = new StringBuilder();
 		
-		if (code.length() > 0) {
-			Token token = null;
-			TokenType type = UNKNOW;;
-			StringBuilder tokenStr = new StringBuilder();
-			char ch = code.charAt(0);
-			if (Character.isDigit(ch) || ch == '.') {
-				boolean dotExist = false;
-				do {
-					ch = code.charAt(0);
-					if (Character.isDigit(ch))
-						tokenStr.append(ch);
-					else if (dotExist == false && ch == '.') {
-						dotExist = true;
-						tokenStr.append(ch);
-					} else
-						break;
-					code.deleteCharAt(0);
-				} while (code.length() > 0);
-				if (tokenStr.equals("."))
-					type = DOT;
-				else if (dotExist)
-					type = FLOAT;
-				else
-					type = INTEGER;
-			} else if (ch == '+') {
-				tokenStr.append(ch);
-				type = ADD;
-				code.deleteCharAt(0);
-			} else if (ch == '-') {
-				tokenStr.append(ch);
-				type = SUB;
-				code.deleteCharAt(0);
-			} else if (ch == ',') {
-				tokenStr.append(ch);
-				type = COMMA;
-				code.deleteCharAt(0);
-			} else if (ch == ';') {
-				tokenStr.append(ch);
-				type = SEMICOLON;
-				code.deleteCharAt(0);
-			} else if (ch == ':') {
-				tokenStr.append(ch);
-				type = COLON;
-				code.deleteCharAt(0);
-			} else if (ch == '*') {
-				tokenStr.append(ch);
-				type = MULTI;
-				code.deleteCharAt(0);
-			} else if (ch == '"') {
-				code.deleteCharAt(0);
-				boolean escape = false;
-				while (code.length() > 0) {
-					ch = code.charAt(0);
-					code.deleteCharAt(0);
-					if (ch == '"') {
-						if(escape == false) {
-							type = STRING;
-							break;
-						}
-					} else if (ch == '\\' && escape == false) {
-						escape = true;
-						continue;
-					}
-					escape = false;
+		char ch = code.charAt(0);
+		if (Character.isDigit(ch) || ch == '.') {
+			boolean dotExist = false;
+			do {
+				ch = code.charAt(0);
+				if (Character.isDigit(ch))
 					tokenStr.append(ch);
-				}
-			} else if (ch == '/') {
-				tokenStr.append(ch);
-				type = DIV;
+				else if (dotExist == false && ch == '.') {
+					dotExist = true;
+					tokenStr.append(ch);
+				} else
+					break;
 				code.deleteCharAt(0);
-			}  else if (ch == '(') {
-				tokenStr.append(ch);
-				type = OPEN_PARENTHESIS;
+			} while (code.length() > 0);
+			if (tokenStr.equals("."))
+				type = DOT;
+			else if (dotExist)
+				type = FLOAT;
+			else
+				type = INTEGER;
+		} else if (ch == '+') {
+			tokenStr.append(ch);
+			type = ADD;
+			code.deleteCharAt(0);
+		} else if (ch == '-') {
+			tokenStr.append(ch);
+			type = SUB;
+			code.deleteCharAt(0);
+		} else if (ch == ',') {
+			tokenStr.append(ch);
+			type = COMMA;
+			code.deleteCharAt(0);
+		} else if (ch == ';') {
+			tokenStr.append(ch);
+			type = SEMICOLON;
+			code.deleteCharAt(0);
+		} else if (ch == ':') {
+			tokenStr.append(ch);
+			type = COLON;
+			code.deleteCharAt(0);
+		} else if (ch == '*') {
+			tokenStr.append(ch);
+			type = MULTI;
+			code.deleteCharAt(0);
+		} else if (ch == '"') {
+			code.deleteCharAt(0);
+			boolean escape = false;
+			while (code.length() > 0) {
+				ch = code.charAt(0);
 				code.deleteCharAt(0);
-			} else if (ch == ')') {
-				tokenStr.append(ch);
-				type = CLOSE_PARENTHESIS;
-				code.deleteCharAt(0);
-			} else if (ch == '{') {
-				tokenStr.append(ch);
-				type = OPEN_BRACE;
-				code.deleteCharAt(0);
-			} else if (ch == '}') {
-				tokenStr.append(ch);
-				type = CLOSE_BRACE;
-				code.deleteCharAt(0);
-			} else if (ch == '[') {
-				tokenStr.append(ch);
-				type = OPEN_BRACKET;
-				code.deleteCharAt(0);
-			} else if (ch == ']') {
-				tokenStr.append(ch);
-				type = CLOSE_BRACKET;
-				code.deleteCharAt(0);
-			} else if (ch == '=') {
-				tokenStr.append(ch);
-				type = ASSIGN;
-				code.deleteCharAt(0);
-				if (code.length() > 0 && code.charAt(0) == '=') {
-					type = EQ;
-					tokenStr.append('=');
-					code.deleteCharAt(0);
-				}
-			} else if (ch == '!') {
-				tokenStr.append(ch);
-				type = NOT;
-				code.deleteCharAt(0);
-			} else if (ch == '>') {
-				tokenStr.append(ch);
-				type = GT;
-				code.deleteCharAt(0);
-				if (code.length() > 0 && code.charAt(0) == '=') {
-					type = GTE;
-					tokenStr.append('=');
-					code.deleteCharAt(0);
-				}
-			} else if (ch == '<') {
-				tokenStr.append(ch);
-				type = LT;
-				code.deleteCharAt(0);
-				if (code.length() > 0 && code.charAt(0) == '=') {
-					type = LTE;
-					tokenStr.append('=');
-					code.deleteCharAt(0);
-				}
-			} else if (ch == '|') {
-				tokenStr.append(ch);
-				type = UNKNOW;
-				code.deleteCharAt(0);
-				if (code.length() > 0 && code.charAt(0) == '|') {
-					type = OR;
-					tokenStr.append('|');
-					code.deleteCharAt(0);
-				}
-			} else if (ch == '&') {
-				tokenStr.append(ch);
-				type = UNKNOW;
-				code.deleteCharAt(0);
-				if (code.length() > 0 && code.charAt(0) == '&') {
-					type = AND;
-					tokenStr.append('&');
-					code.deleteCharAt(0);
-				}
-			} else {
-				do {
-					ch = code.charAt(0);
-					if (Character.isLetterOrDigit(ch)) {
-						tokenStr.append(ch);
-						code.deleteCharAt(0);
-					}
-					else
+				if (ch == '"') {
+					if(escape == false) {
+						type = STRING;
 						break;
-				} while (code.length() > 0);
-				String str = tokenStr.toString();
-				if ("if".equals(str)) {
-					type = IF;
-				} else if ("elif".equals(str)) {
-					type = ELIF;
-				} else if ("else".equals(str)) {
-					type = ELSE;
-				} else if ("true".equals(str)) {
-					type = BOOLEAN;
-				} else if ("false".equals(str)) {
-					type = BOOLEAN;
-				} else if ("while".equals(str)) {
-					type = WHILE;
-				} else if ("for".equals(str)) {
-					type = FOR;
-				} else if ("break".equals(str)) {
-					type = BREAK;
-				} else if ("return".equals(str)) {
-					type = RETURN;
-				} else {
-					type = IDENTIFIER;
+					}
+				} else if (ch == '\\' && escape == false) {
+					escape = true;
+					continue;
 				}
+				escape = false;
+				tokenStr.append(ch);
 			}
-
-			token = new Token(tokenStr.toString(), type);
-			return token;
+		} else if (ch == '/') {
+			code.deleteCharAt(0);
+			while (code.length() > 0) {
+				
+			}
+			tokenStr.append(ch);
+			type = DIV;
+			code.deleteCharAt(0);
+		}  else if (ch == '(') {
+			tokenStr.append(ch);
+			type = OPEN_PARENTHESIS;
+			code.deleteCharAt(0);
+		} else if (ch == ')') {
+			tokenStr.append(ch);
+			type = CLOSE_PARENTHESIS;
+			code.deleteCharAt(0);
+		} else if (ch == '{') {
+			tokenStr.append(ch);
+			type = OPEN_BRACE;
+			code.deleteCharAt(0);
+		} else if (ch == '}') {
+			tokenStr.append(ch);
+			type = CLOSE_BRACE;
+			code.deleteCharAt(0);
+		} else if (ch == '[') {
+			tokenStr.append(ch);
+			type = OPEN_BRACKET;
+			code.deleteCharAt(0);
+		} else if (ch == ']') {
+			tokenStr.append(ch);
+			type = CLOSE_BRACKET;
+			code.deleteCharAt(0);
+		} else if (ch == '?') {
+			tokenStr.append(ch);
+			type = QUESTION;
+			code.deleteCharAt(0);
+		} else if (ch == '=') {
+			tokenStr.append(ch);
+			type = ASSIGN;
+			code.deleteCharAt(0);
+			if (code.length() > 0 && code.charAt(0) == '=') {
+				type = EQ;
+				tokenStr.append('=');
+				code.deleteCharAt(0);
+			}
+		} else if (ch == '!') {
+			tokenStr.append(ch);
+			type = NOT;
+			code.deleteCharAt(0);
+		} else if (ch == '>') {
+			tokenStr.append(ch);
+			type = GT;
+			code.deleteCharAt(0);
+			if (code.length() > 0 && code.charAt(0) == '=') {
+				type = GTE;
+				tokenStr.append('=');
+				code.deleteCharAt(0);
+			}
+		} else if (ch == '<') {
+			tokenStr.append(ch);
+			type = LT;
+			code.deleteCharAt(0);
+			if (code.length() > 0 && code.charAt(0) == '=') {
+				type = LTE;
+				tokenStr.append('=');
+				code.deleteCharAt(0);
+			}
+		} else if (ch == '|') {
+			tokenStr.append(ch);
+			type = UNKNOW;
+			code.deleteCharAt(0);
+			if (code.length() > 0 && code.charAt(0) == '|') {
+				type = OR;
+				tokenStr.append('|');
+				code.deleteCharAt(0);
+			}
+		} else if (ch == '&') {
+			tokenStr.append(ch);
+			type = UNKNOW;
+			code.deleteCharAt(0);
+			if (code.length() > 0 && code.charAt(0) == '&') {
+				type = AND;
+				tokenStr.append('&');
+				code.deleteCharAt(0);
+			}
+		} else {
+			do {
+				ch = code.charAt(0);
+				if (Character.isLetterOrDigit(ch)) {
+					tokenStr.append(ch);
+					code.deleteCharAt(0);
+				}
+				else
+					break;
+			} while (code.length() > 0);
+			String str = tokenStr.toString();
+			if ("if".equals(str)) {
+				type = IF;
+			} else if ("elif".equals(str)) {
+				type = ELIF;
+			} else if ("else".equals(str)) {
+				type = ELSE;
+			} else if ("true".equals(str)) {
+				type = BOOLEAN;
+			} else if ("false".equals(str)) {
+				type = BOOLEAN;
+			} else if ("while".equals(str)) {
+				type = WHILE;
+			} else if ("for".equals(str)) {
+				type = FOR;
+			} else if ("break".equals(str)) {
+				type = BREAK;
+			} else if ("return".equals(str)) {
+				type = RETURN;
+			} else {
+				type = IDENTIFIER;
+			}
 		}
-		
-		return null;
+
+		token.setStr(tokenStr.toString());
+		token.setTokenType(type);
 	}
 	
 	public Token expect(TokenType tokenType) throws Exception {
@@ -289,5 +296,13 @@ public class Tokenizer {
 		List<Token> tokens = tokenizer.getTokens();
 		for (Token token : tokens)
 			System.out.println(token);
+	}
+}
+
+class StringScanner {
+	private String str;
+	private int pos;
+	public StringScanner(String str) {
+		this.str = str;
 	}
 }

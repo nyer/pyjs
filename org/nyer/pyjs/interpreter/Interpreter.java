@@ -40,7 +40,6 @@ public class Interpreter {
 	}
 	
 	public Object run(List<Instrument> instruments) throws Exception {
-		InterpretContext context = new InterpretContext();
 		Object ret = null;
 		for (Instrument instrument : instruments) {
 			ret = instrument.invoke(env);

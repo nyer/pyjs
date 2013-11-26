@@ -5,6 +5,7 @@ public enum TokenType {
 	COMMA,
 	SEMICOLON,
 	COLON,
+	QUESTION,
 
 	ASSIGN,
 	OPEN_PARENTHESIS,
