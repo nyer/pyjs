@@ -19,25 +19,26 @@ import org.nyer.pyjs.primitive.operator.ValueOp;
 import org.nyer.pyjs.primitive.type.Void;
 
 public class While extends ValueOp {
+	private Instrument conditionInstrument;
 	private List<Instrument> trueInstruments;
-	public While(List<Instrument> trueInstruments) {
+	public While(Instrument conditionInstrument, List<Instrument> trueInstruments) {
 		super(new String[] {"boolean expression"});
+		this.conditionInstrument = conditionInstrument;
 		this.trueInstruments = trueInstruments;
 	}
 
 	@Override
 	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
-		boolean condition = checkBoolOperand(env, arguments.get(0));
+		boolean condition = checkBoolOperand(env, conditionInstrument.invoke(env));
 
 		IFun ret = new Void();
-		if (condition) {
-			while (condition) {
-				for (int i = 0, s = trueInstruments.size();i < s;i ++) {
-					Instrument instrument = trueInstruments.get(i);
-					ret = instrument.invoke(env);
-				}
-				condition = checkBoolOperand(env, ret);
+		while (condition) {
+			for (int i = 0, s = trueInstruments.size();i < s;i ++) {
+				Instrument instrument = trueInstruments.get(i);
+				ret = instrument.invoke(env);
 			}
+			
+			condition = checkBoolOperand(env, conditionInstrument.invoke(env));
 		}
 		
 		return ret;

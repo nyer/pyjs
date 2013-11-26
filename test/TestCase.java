@@ -10,8 +10,13 @@
 
 package test;
 
+import java.util.List;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.nyer.pyjs.Instrument;
+import org.nyer.pyjs.Parser;
+import org.nyer.pyjs.Tokenizer;
 import org.nyer.pyjs.interpreter.Interpreter;
 
 public class TestCase {
@@ -43,5 +48,19 @@ public class TestCase {
 	public void testAnonymous() throws Exception {
 		String code = "(function (a) {println(a);}) (100)";
 		interpreter.run(code);
+	}
+	
+	@Test
+	public void testLoop() throws Exception {
+		long start = System.currentTimeMillis();
+		int r = 10000000;
+		for (int i = 0; i < r;i ++);
+		System.out.println(System.currentTimeMillis() - start);
+		String code = "a = 10000000; while (a > 0) {a = a -1}";
+		Parser parser = new Parser();
+		List<Instrument> instruments = parser.parse(code);
+		start = System.currentTimeMillis();
+		interpreter.run(instruments);
+		System.out.println(System.currentTimeMillis() - start);
 	}
 }
