@@ -10,8 +10,6 @@
 
 package org.nyer.pyjs.primitive.type;
 
-import java.util.List;
-
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.AbstractFun;
@@ -25,7 +23,7 @@ public abstract class Value extends AbstractFun {
 	}
 	
 	@Override
-	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
+	public IFun invoke(Env env, IFun[] arguments) throws Exception {
 		return this;
 	}
 	

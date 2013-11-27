@@ -10,7 +10,7 @@
 
 package org.nyer.pyjs.primitive;
 
-import java.util.List;
+import java.util.Arrays;
 
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
@@ -22,11 +22,11 @@ public class FunCall extends AbstractFun {
 	}
 
 	@Override
-	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
-		IFun func = arguments.get(0);
+	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+		IFun func = arguments[0];
 		if (func instanceof Value)
 			throw new Exception("value cannot be invoked, " + func);
 		
-		return func.invoke(env, arguments.subList(1, arguments.size()));
+		return func.invoke(env, Arrays.copyOfRange(arguments, 1, arguments.length));
 	}
 }

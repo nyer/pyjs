@@ -161,10 +161,8 @@ public class Parser {
 			if (fun instanceof Assignable == false)
 				throw new Exception("Invalid left-hand side in assignment");
 			Assignable assign = (Assignable) fun;
-			List<Instrument> arguments = instrument.getArguments();
-			arguments.add(expression());
 			
-			instrument = new Instrument(new Assign(assign), arguments);
+			instrument = new Instrument(new Assign(assign), instrument.getArguments(), expression());
 		}
 		
 		return instrument;

@@ -10,42 +10,54 @@
 
 package org.nyer.pyjs;
 
-import java.util.ArrayList;
+import java.lang.reflect.Array;
 import java.util.List;
 
 
 public class Instrument {
 	private IFun fun;
-	private List<Instrument> arguments;
+	private Instrument[] arguments;
 	
 	public Instrument(IFun fun, List<Instrument> arguments) {
-		this.fun = fun;
-		this.arguments = arguments;
+		listInit(fun, arguments);
 	}
 	
 	public Instrument(IFun fun, Instrument argument, List<Instrument> arguments) {
 		this.fun = fun;
 		arguments.add(0, argument);
-		this.arguments = arguments;
+
+		listInit(fun, arguments);
 	}
-	
+
+	private void listInit(IFun fun, List<Instrument> arguments) {
+		this.fun = fun;
+		this.arguments = (Instrument[]) Array.newInstance(Instrument.class, arguments.size());
+		for (int i = 0, s = arguments.size();i < s;i ++)
+			this.arguments[i] = arguments.get(i);
+	}
 	
 	public Instrument(IFun fun, Instrument... arguments) {
 		this.fun = fun;
-		this.arguments = new ArrayList<Instrument>(arguments.length);
-		for (int i = 0, s = arguments.length;i < s;i ++)
-			this.arguments.add(arguments[i]);
+		this.arguments = arguments;
+	}
+	
+	public Instrument(IFun fun, Instrument[] arguments, Instrument instrument) {
+		this.fun = fun;
+		this.arguments = (Instrument[]) Array.newInstance(Instrument.class, arguments.length + 1);
+		for (int i = 0, s = arguments.length; i < s; i ++)
+			this.arguments[i] = arguments[i];
+		this.arguments[this.arguments.length -1] = instrument;
 	}
 	
 	public Instrument(IFun fun) {
 		this.fun = fun;
-		this.arguments = new ArrayList<Instrument>(0);
+		this.arguments = (Instrument[]) Array.newInstance(Instrument.class, 0);
 	}
 	
 	public IFun invoke(Env env) throws Exception {
-		List<IFun> funArgs = new ArrayList<IFun>(arguments.size());
-		for (int i = 0, s = arguments.size();i < s;i ++)
-			funArgs.add(arguments.get(i).invoke(env));
+		IFun[] funArgs = (IFun[]) Array.newInstance(IFun.class, arguments.length);
+		for (int i = 0, s = arguments.length;i < s;i ++)
+			funArgs[i] = arguments[i].invoke(env);
 		
 		return fun.invoke(env, funArgs);
 	}
@@ -59,7 +71,7 @@ public class Instrument {
 		return fun;
 	}
 	
-	public List<Instrument> getArguments() {
+	public Instrument[] getArguments() {
 		return arguments;
 	}
 }

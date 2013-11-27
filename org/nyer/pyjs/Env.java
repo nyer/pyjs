@@ -11,7 +11,6 @@
 package org.nyer.pyjs;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Env {
@@ -29,12 +28,12 @@ public class Env {
 		map.put(identifier, value);
 	}
 	
-	public Env extend(String[] identifiers, List<IFun> values) {
+	public Env extend(String[] identifiers, IFun[] values) {
 		Env env = new Env(this);
 		env.map = new HashMap<String, IFun>();
 		if (identifiers != null) {
 			for (int i = 0, s = identifiers.length;i < s;i ++) {
-				env.put(identifiers[i], values.get(i));
+				env.put(identifiers[i], values[i]);
 			}
 		}
 		

@@ -10,8 +10,6 @@
 
 package org.nyer.pyjs.primitive;
 
-import java.util.List;
-
 import org.nyer.pyjs.Assignable;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
@@ -24,7 +22,7 @@ public class Identifier extends Value implements Assignable {
 	}
 
 	@Override
-	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
+	public IFun invoke(Env env, IFun[] arguments) throws Exception {
 		String name = getValue();
 		IFun obj = env.lookUp(name);
 		if (obj == null)
@@ -34,8 +32,8 @@ public class Identifier extends Value implements Assignable {
 	}
 	
 	@Override
-	public IFun assign(Env env, List<IFun> arguments) throws Exception {
-		IFun value = arguments.get(0);
+	public IFun assign(Env env, IFun[] arguments) throws Exception {
+		IFun value = arguments[0];
 		env.put(getValue(), value);
 		
 		return value;
@@ -50,6 +48,6 @@ public class Identifier extends Value implements Assignable {
 	public String getTypeStr(Env env) throws Exception {
 		if (env == null)
 			return "unknow";
-		return this.invoke(env, (List<IFun>)null).getTypeStr(env);
+		return this.invoke(env, (IFun[])null).getTypeStr(env);
 	}
 }

@@ -10,8 +10,6 @@
 
 package org.nyer.pyjs.primitive.operator;
 
-import java.util.List;
-
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.PjBoolean;
@@ -23,9 +21,9 @@ public class GT extends ValueOp {
 	}
 
 	@Override
-	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
-		Number op1 = checkNumOperand(env, arguments.get(0));
-		Number op2 = checkNumOperand(env, arguments.get(1));
+	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+		Number op1 = checkNumOperand(env, arguments[0]);
+		Number op2 = checkNumOperand(env, arguments[1]);
 		
 		if (op1 instanceof Integer && op2 instanceof Integer) {
 			Integer v1 = (Integer) op1;

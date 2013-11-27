@@ -19,21 +19,21 @@ import org.nyer.pyjs.primitive.operator.ValueOp;
 import org.nyer.pyjs.primitive.type.Void;
 
 public class Cond extends ValueOp {
-	private List<Instrument> trueInstruments;
+	private Instrument[] trueInstruments;
 	private Instrument falseInstrument;
 	public Cond(List<Instrument> trueInstruments, Instrument falseInstrument) {
 		super(new String[] {"boolean"});
-		this.trueInstruments = trueInstruments;
+		this.trueInstruments = trueInstruments.toArray(new Instrument[trueInstruments.size()]);
 		this.falseInstrument = falseInstrument;
 	}
 
 	@Override
-	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
-		boolean condition = checkBoolOperand(env, arguments.get(0));
+	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+		boolean condition = checkBoolOperand(env, arguments[0]);
 		IFun ret = new Void();
 		if (condition) {
-			for (int i = 0, s = trueInstruments.size();i < s;i ++) {
-				ret = trueInstruments.get(i).invoke(env);
+			for (int i = 0, s = trueInstruments.length;i < s;i ++) {
+				ret = trueInstruments[i].invoke(env);
 			}
 		} else if (falseInstrument != null) {
 			ret = falseInstrument.invoke(env);

@@ -10,8 +10,6 @@
 
 package org.nyer.pyjs.statement;
 
-import java.util.List;
-
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.AbstractFun;
@@ -23,10 +21,10 @@ public class Return extends AbstractFun {
 	}
 
 	@Override
-	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
+	public IFun invoke(Env env, IFun[] arguments) throws Exception {
 		IFun ret = new Void();
-		if (arguments.size() > 0)
-			ret = arguments.get(0);
+		if (arguments.length > 0)
+			ret = arguments[0];
 		
 		return ret;
 	}

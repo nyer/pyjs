@@ -10,8 +10,6 @@
 
 package org.nyer.pyjs.primitive.operator;
 
-import java.util.List;
-
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.PjFloat;
@@ -23,9 +21,9 @@ public class Sub extends ValueOp {
 	}
 	
 	@Override
-	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
-		if (arguments.size() == 1) {
-			IFun arg1 = arguments.get(0);
+	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+		if (arguments.length == 1) {
+			IFun arg1 = arguments[0];
 			Number value = checkNumOperand(env, arg1);
 			if (value instanceof Integer) {
 				return new PjInteger(- value.intValue());
@@ -33,8 +31,8 @@ public class Sub extends ValueOp {
 				return new PjFloat(- value.floatValue());
 			}
 		} else {
-			Number op1 = checkNumOperand(env, arguments.get(0));
-			Number op2 = checkNumOperand(env, arguments.get(1));
+			Number op1 = checkNumOperand(env, arguments[0]);
+			Number op2 = checkNumOperand(env, arguments[1]);
 			
 			if (op1 instanceof Integer && op2 instanceof Integer) {
 				Integer v1 = (Integer) op1;

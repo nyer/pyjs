@@ -22,7 +22,7 @@ public class PjArray extends Value {
 	}
 
 	@Override
-	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
+	public IFun invoke(Env env, IFun[] arguments) throws Exception {
 		this.value = arguments;
 		
 		return this;

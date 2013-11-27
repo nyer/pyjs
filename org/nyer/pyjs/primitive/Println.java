@@ -10,8 +10,6 @@
 
 package org.nyer.pyjs.primitive;
 
-import java.util.List;
-
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.Void;
@@ -22,9 +20,9 @@ public class Println extends AbstractFun {
 	}
 	
 	@Override
-	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
-		if (arguments.size() > 0)
-			System.out.println(arguments.get(0));
+	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+		if (arguments.length > 0)
+			System.out.println(arguments[0]);
 		else
 			System.out.println();
 		return new Void();

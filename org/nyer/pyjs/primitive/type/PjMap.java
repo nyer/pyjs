@@ -11,7 +11,6 @@
 package org.nyer.pyjs.primitive.type;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.nyer.pyjs.Env;
@@ -24,10 +23,10 @@ public class PjMap extends Value {
 	}
 	
 	@Override
-	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
+	public IFun invoke(Env env, IFun[] arguments) throws Exception {
 		Map<Object, Object> map = new HashMap<Object, Object>();
-		for (int i = 0, s= arguments.size();i < s;i += 2) {
-			map.put(arguments.get(i), arguments.get(i + 1));
+		for (int i = 0, s= arguments.length;i < s;i += 2) {
+			map.put(arguments[i], arguments[i + 1]);
 		}
 		this.value = map;
 		

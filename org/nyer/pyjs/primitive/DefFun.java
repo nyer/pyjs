@@ -18,23 +18,23 @@ import org.nyer.pyjs.Instrument;
 import org.nyer.pyjs.primitive.type.Void;
 
 public class DefFun extends AbstractFun {
-	protected List<Instrument> instruments;
+	protected Instrument[] instruments;
 	public DefFun(String[] parameters, List<Instrument> instruments) {
 		super(parameters);
-		this.instruments = instruments;
+		this.instruments = instruments.toArray(new Instrument[instruments.size()]);
 	}
 	
 	@Override
-	public IFun invoke(final Env closure, List<IFun> arguments) throws Exception {
+	public IFun invoke(final Env closure, IFun[] arguments) throws Exception {
 		IFun func = new AbstractFun(getParameters()) {
 			
 			@Override
-			public IFun invoke(Env env, List<IFun> arguments) throws Exception {
+			public IFun invoke(Env env, IFun[] arguments) throws Exception {
 				Env newEnv = closure.extend(getParameters(), arguments);
 				IFun ret = new Void();
-				List<Instrument> instruments = DefFun.this.instruments;
-				for (int i = 0, s = instruments.size();i < s;i ++) {
-					Instrument instrument = instruments.get(i);
+				Instrument[] instruments = DefFun.this.instruments;
+				for (int i = 0, s = instruments.length;i < s;i ++) {
+					Instrument instrument = instruments[i];
 					ret = instrument.invoke(newEnv);
 				}
 				return ret;
@@ -44,7 +44,7 @@ public class DefFun extends AbstractFun {
 		return func;
 	}
 	
-	public List<Instrument> getInstruments() {
+	public Instrument[] getInstruments() {
 		return instruments;
 	}
 }

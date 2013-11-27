@@ -28,12 +28,12 @@ public class ArrayMapVisitor extends AbstractFun implements Assignable {
 	}
 
 	@Override
-	public IFun invoke(Env env, List<IFun> arguments) throws Exception {
-		IFun obj = arguments.get(0);
+	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+		IFun obj = arguments[0];
 		if (obj instanceof PjArray == false && obj instanceof PjMap == false)
 			throw new Exception("bracket access can only apply to array or map, " + obj);
 
-		IFun idx = arguments.get(1);
+		IFun idx = arguments[1];
 		if (idx instanceof Value == false)
 			throw new Exception("key must be an value, " + idx);
 		
@@ -55,13 +55,13 @@ public class ArrayMapVisitor extends AbstractFun implements Assignable {
 	}
 
 	@Override
-	public IFun assign(Env env, List<IFun> arguments) throws Exception {
-		IFun obj = arguments.get(0);
+	public IFun assign(Env env, IFun[] arguments) throws Exception {
+		IFun obj = arguments[0];
 		if (obj instanceof PjArray == false && obj instanceof PjMap == false)
 			throw new Exception("bracket access can only apply to array or map, " + obj);
 
-		IFun right = arguments.get(2);
-		IFun idx = arguments.get(1);
+		IFun right = arguments[2];
+		IFun idx = arguments[1];
 		if (idx instanceof Value == false)
 			throw new Exception("key must be an value, " + idx);
 		

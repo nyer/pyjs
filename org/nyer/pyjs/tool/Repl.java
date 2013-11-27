@@ -25,7 +25,7 @@ public class Repl {
 				try {
 					System.out.println("<< " + interpreter.run(line));
 				} catch (Exception e) {
-					System.out.println(e.getMessage());
+					e.printStackTrace();
 				}
 				System.out.print(">>");
 			}
