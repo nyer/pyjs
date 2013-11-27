@@ -10,6 +10,7 @@
 
 package org.nyer.pyjs.primitive.type;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 
 public class PjFloat extends Value {
@@ -25,6 +26,11 @@ public class PjFloat extends Value {
 	@Override
 	public Float getValue() {
 		return (Float) super.getValue();
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 	
 	public static PjFloat valueOf(final float v) {

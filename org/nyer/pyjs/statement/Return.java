@@ -10,10 +10,11 @@
 
 package org.nyer.pyjs.statement;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.AbstractFun;
-import org.nyer.pyjs.primitive.type.Void;
+import org.nyer.pyjs.primitive.type.PjUndefined;
 
 public class Return extends AbstractFun {
 	public Return() {
@@ -22,10 +23,15 @@ public class Return extends AbstractFun {
 
 	@Override
 	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		IFun ret = new Void();
+		IFun ret = new PjUndefined();
 		if (arguments.length > 0)
 			ret = arguments[0];
 		
 		return ret;
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

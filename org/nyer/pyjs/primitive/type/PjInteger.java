@@ -10,6 +10,7 @@
 
 package org.nyer.pyjs.primitive.type;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 
 
@@ -27,6 +28,11 @@ public class PjInteger extends Value  {
 	@Override
 	public Integer getValue() {
 		return (Integer) super.getValue();
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 	
 	public static PjInteger valueOf(final int v) {

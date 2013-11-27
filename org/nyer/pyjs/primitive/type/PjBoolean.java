@@ -10,6 +10,7 @@
 
 package org.nyer.pyjs.primitive.type;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 
 
@@ -26,6 +27,11 @@ public class PjBoolean extends Value  {
 	@Override
 	public Boolean getValue() {
 		return (Boolean) super.getValue();
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 	
 	public static PjBoolean True = new PjBoolean(true);

@@ -8,22 +8,29 @@
  *   You must not remove this notice, or any other, from this software.
  **/
 
-package org.nyer.pyjs.primitive.operator;
+package org.nyer.pyjs.primitive.type;
 
-import org.nyer.pyjs.Assignable;
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
-import org.nyer.pyjs.IFun;
-import org.nyer.pyjs.primitive.AbstractFun;
 
-public class Assign extends AbstractFun {
-	private Assignable assign;
-	public Assign(Assignable assign) {
-		super(new String[] {"identifier", "value or expression"});
-		this.assign = assign;
+public class PjUndefined extends Value {
+
+	public PjUndefined() {
+		super(null, "");
 	}
 	
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		return assign.assign(env, arguments);
+	public String getTypeStr(Env env) {
+		return "undefined";
+	}
+	
+	@Override
+	public String toString() {
+		return "undefined";
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

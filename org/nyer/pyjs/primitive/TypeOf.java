@@ -10,12 +10,13 @@
 
 package org.nyer.pyjs.primitive;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.PjString;
+import org.nyer.pyjs.primitive.type.PjUndefined;
 
 public class TypeOf extends AbstractFun {
-
 	public TypeOf() {
 		super(new String[] {"expr"});
 	}
@@ -23,6 +24,18 @@ public class TypeOf extends AbstractFun {
 	@Override
 	public IFun invoke(Env env, IFun[] arguments) throws Exception {
 		IFun arg = arguments[0];
+		if (arg instanceof Identifier) {
+			Identifier identifier = (Identifier) arg;
+			IFun obj = env.lookUp(identifier.getValue());
+			if (obj == null)
+				arg = new PjUndefined();
+		}
+		
 		return new PjString(arg.getTypeStr(env));
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

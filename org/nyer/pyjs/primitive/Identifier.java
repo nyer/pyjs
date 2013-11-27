@@ -10,7 +10,7 @@
 
 package org.nyer.pyjs.primitive;
 
-import org.nyer.pyjs.Assignable;
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.Value;
@@ -32,14 +32,6 @@ public class Identifier extends Value implements Assignable {
 	}
 	
 	@Override
-	public IFun assign(Env env, IFun[] arguments) throws Exception {
-		IFun value = arguments[0];
-		env.put(getValue(), value);
-		
-		return value;
-	}
-	
-	@Override
 	public String getValue() {
 		return (String) super.getValue();
 	}
@@ -49,5 +41,10 @@ public class Identifier extends Value implements Assignable {
 		if (env == null)
 			return "unknow";
 		return this.invoke(env, (IFun[])null).getTypeStr(env);
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

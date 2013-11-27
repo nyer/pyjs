@@ -21,7 +21,6 @@ import org.nyer.pyjs.Env;
 import org.nyer.pyjs.Instrument;
 import org.nyer.pyjs.Parser;
 import org.nyer.pyjs.primitive.Println;
-import org.nyer.pyjs.primitive.TypeOf;
 import org.nyer.pyjs.primitive.operator.Add;
 import org.nyer.pyjs.primitive.operator.Div;
 import org.nyer.pyjs.primitive.operator.Multi;
@@ -42,7 +41,6 @@ public class Interpreter {
 		env.put("/", new Div());
 		env.put("*", new Multi());
 		env.put("println", new Println());
-		env.put("typeof", new TypeOf());
 	}
 	
 	public List<Instrument> parse(String code) throws Exception {

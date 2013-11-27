@@ -13,6 +13,7 @@ package org.nyer.pyjs.primitive.type;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 
@@ -42,5 +43,10 @@ public class PjMap extends Value {
 	@Override
 	public Map<Value, IFun> getValue() {
 		return (Map<Value, IFun>) super.getValue();
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

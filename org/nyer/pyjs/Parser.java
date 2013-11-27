@@ -10,18 +10,56 @@
 
 package org.nyer.pyjs;
 
-import static org.nyer.pyjs.TokenType.*;
+import static org.nyer.pyjs.TokenType.AND;
+import static org.nyer.pyjs.TokenType.ASSIGN;
+import static org.nyer.pyjs.TokenType.BOOLEAN;
+import static org.nyer.pyjs.TokenType.BREAK;
+import static org.nyer.pyjs.TokenType.CLOSE_BRACE;
+import static org.nyer.pyjs.TokenType.CLOSE_BRACKET;
+import static org.nyer.pyjs.TokenType.CLOSE_PARENTHESIS;
+import static org.nyer.pyjs.TokenType.COLON;
+import static org.nyer.pyjs.TokenType.COMMA;
+import static org.nyer.pyjs.TokenType.DIV;
+import static org.nyer.pyjs.TokenType.ELIF;
+import static org.nyer.pyjs.TokenType.ELSE;
+import static org.nyer.pyjs.TokenType.EQ;
+import static org.nyer.pyjs.TokenType.FLOAT;
+import static org.nyer.pyjs.TokenType.FOR;
+import static org.nyer.pyjs.TokenType.GT;
+import static org.nyer.pyjs.TokenType.GTE;
+import static org.nyer.pyjs.TokenType.IDENTIFIER;
+import static org.nyer.pyjs.TokenType.IF;
+import static org.nyer.pyjs.TokenType.INTEGER;
+import static org.nyer.pyjs.TokenType.LT;
+import static org.nyer.pyjs.TokenType.LTE;
+import static org.nyer.pyjs.TokenType.MULTI;
+import static org.nyer.pyjs.TokenType.NE;
+import static org.nyer.pyjs.TokenType.NOT;
+import static org.nyer.pyjs.TokenType.OPEN_BRACE;
+import static org.nyer.pyjs.TokenType.OPEN_BRACKET;
+import static org.nyer.pyjs.TokenType.OPEN_PARENTHESIS;
+import static org.nyer.pyjs.TokenType.OR;
+import static org.nyer.pyjs.TokenType.PLUS;
+import static org.nyer.pyjs.TokenType.PLUSPLUS;
+import static org.nyer.pyjs.TokenType.QUESTION;
+import static org.nyer.pyjs.TokenType.RETURN;
+import static org.nyer.pyjs.TokenType.SEMICOLON;
+import static org.nyer.pyjs.TokenType.STRING;
+import static org.nyer.pyjs.TokenType.SUB;
+import static org.nyer.pyjs.TokenType.SUBSUB;
+import static org.nyer.pyjs.TokenType.WHILE;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nyer.pyjs.primitive.ArrayMapVisitor;
+import org.nyer.pyjs.primitive.ArrayMap;
+import org.nyer.pyjs.primitive.Assignable;
 import org.nyer.pyjs.primitive.DefFun;
 import org.nyer.pyjs.primitive.FunCall;
 import org.nyer.pyjs.primitive.Identifier;
+import org.nyer.pyjs.primitive.TypeOf;
 import org.nyer.pyjs.primitive.operator.Add;
 import org.nyer.pyjs.primitive.operator.And;
-import org.nyer.pyjs.primitive.operator.Assign;
 import org.nyer.pyjs.primitive.operator.CondOperator;
 import org.nyer.pyjs.primitive.operator.Div;
 import org.nyer.pyjs.primitive.operator.EQ;
@@ -38,9 +76,11 @@ import org.nyer.pyjs.primitive.operator.Sub;
 import org.nyer.pyjs.primitive.type.PjArray;
 import org.nyer.pyjs.primitive.type.PjBoolean;
 import org.nyer.pyjs.primitive.type.PjFloat;
+import org.nyer.pyjs.primitive.type.PjIdentifierRef;
 import org.nyer.pyjs.primitive.type.PjInteger;
 import org.nyer.pyjs.primitive.type.PjMap;
 import org.nyer.pyjs.primitive.type.PjString;
+import org.nyer.pyjs.primitive.type.PjUndefined;
 import org.nyer.pyjs.statement.Break;
 import org.nyer.pyjs.statement.Cond;
 import org.nyer.pyjs.statement.For;
@@ -160,9 +200,7 @@ public class Parser {
 			IFun fun = instrument.getFun();
 			if (fun instanceof Assignable == false)
 				throw new Exception("Invalid left-hand side in assignment");
-			Assignable assign = (Assignable) fun;
-			
-			instrument = new Instrument(new Assign(assign), instrument.getArguments(), expression());
+			instrument = instrument.toAssign(expression());
 		}
 		
 		return instrument;
@@ -211,8 +249,8 @@ public class Parser {
 	
 	private Instrument addSubExp() throws Exception {
 		Instrument instrument = multiDivExp();
-		while (tokenizer.peek(ADD) || tokenizer.peek(SUB)) {
-			if (tokenizer.accept(ADD)) {
+		while (tokenizer.peek(PLUS) || tokenizer.peek(SUB)) {
+			if (tokenizer.accept(PLUS)) {
 				instrument = new Instrument(new Add(), instrument, multiDivExp());
 			} else if (tokenizer.accept(SUB)) {
 				instrument = new Instrument(new Sub(), instrument, multiDivExp());
@@ -223,34 +261,44 @@ public class Parser {
 	}
 	
 	private Instrument multiDivExp() throws Exception {
-		Instrument instrument = oneOperandExp();
+		Instrument instrument = prefixExp();
 		while (tokenizer.peek(MULTI) || tokenizer.peek(DIV)) {
 			if (tokenizer.accept(MULTI)) {
-				instrument = new Instrument(new Multi(), instrument, oneOperandExp());
+				instrument = new Instrument(new Multi(), instrument, prefixExp());
 			} else if (tokenizer.accept(DIV)){
-				instrument = new Instrument(new Div(), instrument, oneOperandExp());
+				instrument = new Instrument(new Div(), instrument, prefixExp());
 			}
 		}
 		
 		return instrument;
 	}
 	
-	private Instrument oneOperandExp() throws Exception {
+	private Instrument prefixExp() throws Exception {
 		Instrument instrument = null;
-		if (tokenizer.accept(ADD)) {
-			instrument = new Instrument(new Add(), oneOperandExp());
+		if (tokenizer.accept(PLUS)) {
+			instrument = new Instrument(new Add(), prefixExp());
 		} else if (tokenizer.accept(SUB)) {
-			instrument = new Instrument(new Sub(), oneOperandExp());
+			instrument = new Instrument(new Sub(), prefixExp());
 		} else if (tokenizer.accept(NOT)) {
-			instrument = new Instrument(new Not(), oneOperandExp());
+			instrument = new Instrument(new Not(), prefixExp());
+		} else if (tokenizer.accept(PLUSPLUS)) {
+			instrument = prefixExp();
+			if (instrument.getFun() instanceof Assignable == false)
+				throw new Exception("variable exepcted, but found: " + instrument.getFun());
+			instrument = instrument.toAssign(new Instrument(new Add(), instrument, new Instrument(PjInteger.valueOf(1))));
+		} else if (tokenizer.accept(SUBSUB)) {
+			instrument = prefixExp();
+			if (instrument.getFun() instanceof Assignable == false)
+				throw new Exception("variable exepcted, but found: " + instrument.getFun());
+			instrument = instrument.toAssign(new Instrument(new Sub(), instrument, new Instrument(PjInteger.valueOf(1))));
 		} else {
-			instrument = tailExp();
+			instrument = suffixExp();
 		}
 		
 		return instrument;
 	}
 	
-	private Instrument tailExp() throws Exception {
+	private Instrument suffixExp() throws Exception {
 		Instrument instrument = valueExp();
 		if (instrument.getFun().getClass() == DefFun.class)
 			return instrument;
@@ -263,7 +311,7 @@ public class Parser {
 						Instrument posInstrument = expression();
 						tokenizer.expect(CLOSE_BRACKET);
 						
-						instrument = new Instrument(new ArrayMapVisitor(), instrument, posInstrument);
+						instrument = new Instrument(new ArrayMap(), instrument, posInstrument);
 					}
 				}
 
@@ -284,6 +332,19 @@ public class Parser {
 			instrument = new Instrument(new CondOperator(trueInstrument, falseInstrument), instrument);
 		}
 		
+		if (tokenizer.accept(PLUSPLUS)) {
+			if (instrument.getFun() instanceof Assignable == false)
+				throw new Exception("variable exepcted, but found: " + instrument.getFun());
+			instrument = new Instrument(new Sub(), 
+					instrument.toAssign(new Instrument(new Add(), instrument, new Instrument(PjInteger.valueOf(1)))),
+					new Instrument(PjInteger.valueOf(1)));
+		} else if (tokenizer.accept(SUBSUB)) {
+			if (instrument.getFun() instanceof Assignable == false)
+				throw new Exception("variable exepcted, but found: " + instrument.getFun());
+			instrument = new Instrument(new Add(), 
+					instrument.toAssign(new Instrument(new Sub(), instrument, new Instrument(PjInteger.valueOf(1)))),
+					new Instrument(PjInteger.valueOf(1)));
+		}
 		return instrument;
 	}
 	
@@ -294,7 +355,7 @@ public class Parser {
 			tokenizer.expect(CLOSE_PARENTHESIS);
 			instrument = new Instrument(new Parenthesis(), instrument);
 		} else if (tokenizer.peek(IDENTIFIER) 
-				|| tokenizer.peek(ADD) || tokenizer.peek(SUB)
+				|| tokenizer.peek(PLUS) || tokenizer.peek(SUB)
 				|| tokenizer.peek(MULTI) || tokenizer.peek(DIV)) {
 			Token token = tokenizer.nextToken();
 			if ("function".equals(token.getStr())) {
@@ -325,10 +386,22 @@ public class Parser {
 				
 				instrument = new Instrument(new DefFun(parameters.toArray(new String[parameters.size()]), funBody));
 				if (funName != null) {
-					instrument = new Instrument(new Assign(new Identifier(funName)), instrument);
+					instrument = new Instrument(new Identifier(funName)).toAssign(instrument);
 				}
 				
 				return instrument;
+			} else if ("typeof".equals(token.getStr())) {
+				tokenizer.expect(OPEN_PARENTHESIS);
+				Instrument exp = expression();
+				if (exp.getFun() instanceof Identifier) {
+					Identifier identifier = (Identifier) exp.getFun();
+					exp = new Instrument(new PjIdentifierRef(identifier));
+				}
+				
+				instrument = new Instrument(new TypeOf(), exp);
+				tokenizer.expect(CLOSE_PARENTHESIS);
+			} else if ("undefined".equals(token.getStr())) {
+				instrument = new Instrument(new PjUndefined());
 			} else {
 				instrument = new Instrument(new Identifier(token.getStr()));
 			}

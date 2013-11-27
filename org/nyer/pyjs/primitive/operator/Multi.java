@@ -10,6 +10,7 @@
 
 package org.nyer.pyjs.primitive.operator;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.PjFloat;
@@ -45,5 +46,10 @@ public class Multi extends ValueOp {
 				return PjFloat.valueOf(v1 * v2);
 			}
 		}
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

@@ -10,6 +10,7 @@
 
 package org.nyer.pyjs.statement;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.AbstractFun;
@@ -25,4 +26,8 @@ public class Break extends AbstractFun {
 		throw new Exception("break must be in a loop");
 	}
 
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
+	}
 }

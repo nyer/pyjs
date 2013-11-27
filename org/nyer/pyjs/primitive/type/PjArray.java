@@ -10,8 +10,9 @@
 
 package org.nyer.pyjs.primitive.type;
 
-import java.util.List;
+import java.util.Arrays;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 
@@ -33,18 +34,22 @@ public class PjArray extends Value {
 		return "array";
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<IFun> getValue() {
-		return (List<IFun>) super.getValue();
+	public IFun[] getValue() {
+		return (IFun[]) super.getValue();
 	}
 	
 	@Override
 	public String toString() {
 		try {
-			return getTypeStr(null) + getValue();
+			return getTypeStr(null) + Arrays.toString(getValue());
 		} catch (Exception e) {
 		}
 		return "";
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

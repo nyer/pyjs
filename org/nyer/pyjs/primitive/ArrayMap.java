@@ -10,10 +10,9 @@
 
 package org.nyer.pyjs.primitive;
 
-import java.util.List;
 import java.util.Map;
 
-import org.nyer.pyjs.Assignable;
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.PjArray;
@@ -21,9 +20,9 @@ import org.nyer.pyjs.primitive.type.PjInteger;
 import org.nyer.pyjs.primitive.type.PjMap;
 import org.nyer.pyjs.primitive.type.Value;
 
-public class ArrayMapVisitor extends AbstractFun implements Assignable {
+public class ArrayMap extends AbstractFun implements Assignable {
 
-	public ArrayMapVisitor() {
+	public ArrayMap() {
 		super(new String[] {"array", "integer expr"});
 	}
 
@@ -42,12 +41,12 @@ public class ArrayMapVisitor extends AbstractFun implements Assignable {
 			if (key instanceof PjInteger == false)
 				throw new Exception("the subscript must be a integer, but found: " + idx);
 			
-			List<IFun> value = ((PjArray)obj).getValue();
+			IFun[] value = ((PjArray)obj).getValue();
 			int idxV = ((PjInteger)key).getValue();
-			if (idxV >= value.size())
-				throw new Exception("Index out of bounds, index: " + idxV + ", size: " + value.size());
+			if (idxV >= value.length)
+				throw new Exception("Index out of bounds, index: " + idxV + ", size: " + value.length);
 			
-			return value.get(idxV);
+			return value[idxV];
 		} else {
 			Map<Value, IFun> map = ((PjMap)obj).getValue();
 			return map.get(key);
@@ -55,32 +54,7 @@ public class ArrayMapVisitor extends AbstractFun implements Assignable {
 	}
 
 	@Override
-	public IFun assign(Env env, IFun[] arguments) throws Exception {
-		IFun obj = arguments[0];
-		if (obj instanceof PjArray == false && obj instanceof PjMap == false)
-			throw new Exception("bracket access can only apply to array or map, " + obj);
-
-		IFun right = arguments[2];
-		IFun idx = arguments[1];
-		if (idx instanceof Value == false)
-			throw new Exception("key must be an value, " + idx);
-		
-		Value key = (Value) idx;
-		if (obj instanceof PjArray) {
-			if (key instanceof PjInteger == false)
-				throw new Exception("the subscript must be a integer, but found: " + idx);
-			
-			List<IFun> value = ((PjArray)obj).getValue();
-			int idxV = ((PjInteger)key).getValue();
-			if (idxV >= value.size())
-				throw new Exception("Index out of bounds, index: " + idxV + ", size: " + value.size());
-			
-			return value.set(idxV, right);
-		} else {
-			Map<Value, IFun> map = ((PjMap)obj).getValue();
-			map.put(key, right);
-		}
-		
-		return right;
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

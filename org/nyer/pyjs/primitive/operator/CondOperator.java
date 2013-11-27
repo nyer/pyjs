@@ -10,6 +10,7 @@
 
 package org.nyer.pyjs.primitive.operator;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.Instrument;
@@ -33,4 +34,8 @@ public class CondOperator extends ValueOp {
 			return falseInstrument.invoke(env);
 	}
 
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
+	}
 }

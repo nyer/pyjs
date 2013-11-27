@@ -38,7 +38,10 @@ public enum TokenType {
 	LT,
 	LTE,
 	
-	ADD,
+	PLUSPLUS,
+	SUBSUB,
+	
+	PLUS,
 	SUB,
 	MULTI,
 	DIV,

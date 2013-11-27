@@ -78,12 +78,22 @@ public class Tokenizer {
 				type = INTEGER;
 		} else if (ch == '+') {
 			tokenStr.append(ch);
-			type = ADD;
+			type = PLUS;
 			code.deleteCharAt(0);
+			if (code.length() > 0 && code.charAt(0) == '+') {
+				type = PLUSPLUS;
+				tokenStr.append('+');
+				code.deleteCharAt(0);
+			}
 		} else if (ch == '-') {
 			tokenStr.append(ch);
 			type = SUB;
 			code.deleteCharAt(0);
+			if (code.length() > 0 && code.charAt(0) == '-') {
+				type = SUBSUB;
+				tokenStr.append('-');
+				code.deleteCharAt(0);
+			}
 		} else if (ch == ',') {
 			tokenStr.append(ch);
 			type = COMMA;

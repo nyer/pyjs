@@ -10,9 +10,10 @@
 
 package org.nyer.pyjs.primitive;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
-import org.nyer.pyjs.primitive.type.Void;
+import org.nyer.pyjs.primitive.type.PjUndefined;
 
 public class Println extends AbstractFun {
 	public Println() {
@@ -25,6 +26,11 @@ public class Println extends AbstractFun {
 			System.out.println(arguments[0]);
 		else
 			System.out.println();
-		return new Void();
+		return new PjUndefined();
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		
 	}
 }

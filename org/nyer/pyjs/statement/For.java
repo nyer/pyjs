@@ -2,11 +2,12 @@ package org.nyer.pyjs.statement;
 
 import java.util.List;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.Instrument;
 import org.nyer.pyjs.primitive.operator.ValueOp;
-import org.nyer.pyjs.primitive.type.Void;
+import org.nyer.pyjs.primitive.type.PjUndefined;
 
 public class For extends ValueOp {
 	private Instrument[] second;
@@ -21,13 +22,13 @@ public class For extends ValueOp {
 
 	@Override
 	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		IFun condRet = new Void();
+		IFun condRet = new PjUndefined();
 		for (int i = 0, s = second.length;i < s;i ++) {
 			condRet = second[i].invoke(env);
 		}
 		boolean condition = checkBoolOperand(env, condRet);
 
-		IFun ret = new Void();
+		IFun ret = new PjUndefined();
 		while (condition) {
 			for (int i = 0, s = body.length;i < s;i ++) {
 				ret = body[i].invoke(env);
@@ -46,4 +47,8 @@ public class For extends ValueOp {
 		return ret;
 	}
 
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
+	}
 }

@@ -10,6 +10,7 @@
 
 package org.nyer.pyjs.primitive.operator;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.PjBoolean;
@@ -28,4 +29,8 @@ public class EQ extends ValueOp {
 		return PjBoolean.valueOf(op1.equals(op2));
 	}
 
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
+	}
 }

@@ -12,11 +12,12 @@ package org.nyer.pyjs.statement;
 
 import java.util.List;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.Instrument;
 import org.nyer.pyjs.primitive.operator.ValueOp;
-import org.nyer.pyjs.primitive.type.Void;
+import org.nyer.pyjs.primitive.type.PjUndefined;
 
 public class While extends ValueOp {
 	private Instrument conditionInstrument;
@@ -31,7 +32,7 @@ public class While extends ValueOp {
 	public IFun invoke(Env env, IFun[] arguments) throws Exception {
 		boolean condition = checkBoolOperand(env, conditionInstrument.invoke(env));
 
-		IFun ret = new Void();
+		IFun ret = new PjUndefined();
 		while (condition) {
 			for (int i = 0, s = trueInstruments.length;i < s;i ++) {
 				Instrument instrument = trueInstruments[i];
@@ -44,4 +45,8 @@ public class While extends ValueOp {
 		return ret;
 	}
 
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
+	}
 }

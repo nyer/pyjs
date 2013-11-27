@@ -12,6 +12,7 @@ package org.nyer.pyjs.primitive;
 
 import java.util.Arrays;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.Value;
@@ -28,5 +29,10 @@ public class FunCall extends AbstractFun {
 			throw new Exception("value cannot be invoked, " + func);
 		
 		return func.invoke(env, Arrays.copyOfRange(arguments, 1, arguments.length));
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

@@ -10,6 +10,7 @@
 
 package org.nyer.pyjs.primitive.operator;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.PjFloat;
@@ -71,5 +72,10 @@ public class Add extends ValueOp {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

@@ -10,6 +10,7 @@
 
 package org.nyer.pyjs.primitive.type;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 
 public class PjString extends Value {
@@ -26,5 +27,10 @@ public class PjString extends Value {
 	@Override
 	public String getValue() {
 		return (String) super.getValue();
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

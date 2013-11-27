@@ -10,6 +10,7 @@
 
 package org.nyer.pyjs.primitive.operator;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.PjBoolean;
@@ -30,4 +31,8 @@ public class GTE extends ValueOp {
 			return PjBoolean.True;
 	}
 
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
+	}
 }

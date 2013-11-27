@@ -10,6 +10,7 @@
 
 package org.nyer.pyjs.primitive.operator;
 
+import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 
@@ -22,5 +23,10 @@ public class Parenthesis extends ValueOp {
 	@Override
 	public IFun invoke(Env env, IFun[] arguments) throws Exception {
 		return arguments[0];
+	}
+	
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

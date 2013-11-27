@@ -11,10 +11,15 @@
 package org.nyer.pyjs;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 
+import org.nyer.pyjs.primitive.ArrayMapAssign;
+import org.nyer.pyjs.primitive.Identifier;
+import org.nyer.pyjs.primitive.IdentifierAssign;
 
-public class Instrument {
+
+public class Instrument implements Element {
 	private IFun fun;
 	private Instrument[] arguments;
 	
@@ -28,7 +33,7 @@ public class Instrument {
 
 		listInit(fun, arguments);
 	}
-
+	
 	private void listInit(IFun fun, List<Instrument> arguments) {
 		this.fun = fun;
 		this.arguments = (Instrument[]) Array.newInstance(Instrument.class, arguments.size());
@@ -62,6 +67,20 @@ public class Instrument {
 		return fun.invoke(env, funArgs);
 	}
 
+	public Instrument toAssign(Instrument argument) {
+		IFun newFun = null;
+		if (fun instanceof Identifier)
+			newFun = new IdentifierAssign((Identifier)fun) ;
+		else {
+			newFun = new ArrayMapAssign();
+		}
+
+		Instrument[] arguments = Arrays.copyOf(this.arguments, this.arguments.length + 1);
+		arguments[arguments.length -1] = argument;
+		
+		return new Instrument(newFun, arguments);
+	}
+	
 	@Override
 	public String toString() {
 		return "Instrument [fun=" + fun + "]";
@@ -73,5 +92,10 @@ public class Instrument {
 	
 	public Instrument[] getArguments() {
 		return arguments;
+	}
+
+	@Override
+	public void accept(ElementVisitor visitor) {
+		visitor.visit(this);
 	}
 }

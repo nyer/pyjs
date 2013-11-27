@@ -8,23 +8,8 @@
  *   You must not remove this notice, or any other, from this software.
  **/
 
-package org.nyer.pyjs.primitive.type;
+package org.nyer.pyjs.primitive;
 
-import org.nyer.pyjs.Env;
 
-public class Void extends Value {
-
-	public Void() {
-		super(null, "");
-	}
-	
-	@Override
-	public String getTypeStr(Env env) {
-		return "void";
-	}
-	
-	@Override
-	public String toString() {
-		return "void";
-	}
+public interface Assignable {
 }
