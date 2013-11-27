@@ -311,6 +311,20 @@ public class Parser {
 			instrument = instrument.toAssign(new Instrument(new Sub(), instrument, new Instrument(PjInteger.valueOf(1))));
 		} else {
 			instrument = suffixExp();
+
+			if (tokenizer.accept(PLUSPLUS)) {
+				if (instrument.getFun() instanceof Assignable == false)
+					throw new Exception("variable exepcted, but found: " + instrument.getFun());
+				instrument = new Instrument(new Sub(), 
+						instrument.toAssign(new Instrument(new Add(), instrument, new Instrument(PjInteger.valueOf(1)))),
+						new Instrument(PjInteger.valueOf(1)));
+			} else if (tokenizer.accept(SUBSUB)) {
+				if (instrument.getFun() instanceof Assignable == false)
+					throw new Exception("variable exepcted, but found: " + instrument.getFun());
+				instrument = new Instrument(new Add(), 
+						instrument.toAssign(new Instrument(new Sub(), instrument, new Instrument(PjInteger.valueOf(1)))),
+						new Instrument(PjInteger.valueOf(1)));
+			}
 		}
 		
 		return instrument;
@@ -321,41 +335,26 @@ public class Parser {
 		if (instrument.getFun().getClass() == DefFun.class)
 			return instrument;
 		
-		if (tokenizer.peek(OPEN_BRACKET) || tokenizer.peek(OPEN_PARENTHESIS)) {
-			while (tokenizer.peek(OPEN_BRACKET) || tokenizer.peek(OPEN_PARENTHESIS)) {
-				// array or map access
-				if (tokenizer.peek(OPEN_BRACKET)) {
-					while (tokenizer.accept(OPEN_BRACKET)) {
-						Instrument posInstrument = expression();
-						tokenizer.expect(CLOSE_BRACKET);
-						
-						instrument = new Instrument(new ArrayMap(), instrument, posInstrument);
-					}
+		while (tokenizer.peek(OPEN_BRACKET) || tokenizer.peek(OPEN_PARENTHESIS)) {
+			// array or map access
+			if (tokenizer.peek(OPEN_BRACKET)) {
+				while (tokenizer.accept(OPEN_BRACKET)) {
+					Instrument posInstrument = expression();
+					tokenizer.expect(CLOSE_BRACKET);
+					
+					instrument = new Instrument(new ArrayMap(), instrument, posInstrument);
 				}
+			}
 
-				// funcall
-				if (tokenizer.peek(OPEN_PARENTHESIS)) {
-					while (tokenizer.accept(OPEN_PARENTHESIS)) {
-						instrument = new Instrument(new FunCall(), instrument, arguments());
-						tokenizer.expect(CLOSE_PARENTHESIS);
-					}
+			// funcall
+			if (tokenizer.peek(OPEN_PARENTHESIS)) {
+				while (tokenizer.accept(OPEN_PARENTHESIS)) {
+					instrument = new Instrument(new FunCall(), instrument, arguments());
+					tokenizer.expect(CLOSE_PARENTHESIS);
 				}
 			}
 		}
 		
-		if (tokenizer.accept(PLUSPLUS)) {
-			if (instrument.getFun() instanceof Assignable == false)
-				throw new Exception("variable exepcted, but found: " + instrument.getFun());
-			instrument = new Instrument(new Sub(), 
-					instrument.toAssign(new Instrument(new Add(), instrument, new Instrument(PjInteger.valueOf(1)))),
-					new Instrument(PjInteger.valueOf(1)));
-		} else if (tokenizer.accept(SUBSUB)) {
-			if (instrument.getFun() instanceof Assignable == false)
-				throw new Exception("variable exepcted, but found: " + instrument.getFun());
-			instrument = new Instrument(new Add(), 
-					instrument.toAssign(new Instrument(new Sub(), instrument, new Instrument(PjInteger.valueOf(1)))),
-					new Instrument(PjInteger.valueOf(1)));
-		}
 		return instrument;
 	}
 	
