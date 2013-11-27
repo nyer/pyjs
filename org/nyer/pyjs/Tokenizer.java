@@ -129,10 +129,6 @@ public class Tokenizer {
 				tokenStr.append(ch);
 			}
 		} else if (ch == '/') {
-			code.deleteCharAt(0);
-			while (code.length() > 0) {
-				
-			}
 			tokenStr.append(ch);
 			type = DIV;
 			code.deleteCharAt(0);
@@ -312,7 +308,7 @@ public class Tokenizer {
 	}
 	
 	public static void main(String[] args) {
-		Tokenizer tokenizer = new Tokenizer("function hello(e) {}");
+		Tokenizer tokenizer = new Tokenizer("2 / 1 * 2");
 		List<Token> tokens = tokenizer.getTokens();
 		for (Token token : tokens)
 			System.out.println(token);

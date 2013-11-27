@@ -195,26 +195,44 @@ public class Parser {
 	}
 	
 	private Instrument assign() throws Exception {
-		Instrument instrument = logicExp();
+		Instrument instrument = questionExp();
 		if (tokenizer.accept(ASSIGN)) {
 			IFun fun = instrument.getFun();
 			if (fun instanceof Assignable == false)
 				throw new Exception("Invalid left-hand side in assignment");
-			instrument = instrument.toAssign(expression());
+			instrument = instrument.toAssign(assign());
 		}
 		
 		return instrument;
 	}
 	
-	private Instrument logicExp() throws Exception {
-		Instrument instrument = eqExp();
-		while (tokenizer.peek(AND) || tokenizer.peek(OR)) {
-			if (tokenizer.accept(AND)) {
-				instrument = new Instrument(new And(), instrument, eqExp());
-			} else if (tokenizer.accept(OR)) {
-				instrument = new Instrument(new Or(), instrument, eqExp());
-			}
+	private Instrument questionExp() throws Exception {
+		Instrument instrument = orExp();
+		if (tokenizer.accept(QUESTION)) {
+			Instrument trueInstrument = questionExp();
+			tokenizer.expect(COLON);
+			Instrument falseInstrument = questionExp();
+			instrument = new Instrument(new CondOperator(trueInstrument, falseInstrument), instrument);
 		}
+		
+		return instrument;
+	}
+	
+	private Instrument orExp() throws Exception {
+		Instrument instrument = andExp();
+		while (tokenizer.accept(OR)) {
+			instrument = new Instrument(new Or(), instrument, andExp());
+		}
+		
+		return instrument;
+	}
+	
+	private Instrument andExp() throws Exception {
+		Instrument instrument = eqExp();
+		while (tokenizer.accept(AND)) {
+			instrument = new Instrument(new And(), instrument, eqExp());
+		}
+		
 		return instrument;
 	}
 	
@@ -323,13 +341,6 @@ public class Parser {
 					}
 				}
 			}
-		}
-		
-		if (tokenizer.accept(QUESTION)) {
-			Instrument trueInstrument = expression();
-			tokenizer.expect(COLON);
-			Instrument falseInstrument = expression();
-			instrument = new Instrument(new CondOperator(trueInstrument, falseInstrument), instrument);
 		}
 		
 		if (tokenizer.accept(PLUSPLUS)) {
