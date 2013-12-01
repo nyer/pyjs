@@ -21,18 +21,21 @@ import org.nyer.pyjs.primitive.type.PjMap;
 import org.nyer.pyjs.primitive.type.Value;
 
 public class ArrayMap extends AbstractFun implements Assignable {
-
-	public ArrayMap() {
-		super(new String[] {"array", "integer expr"});
+	private IFun am;
+	private IFun key;
+	
+	public ArrayMap(IFun am, IFun key) {
+		this.am = am;
+		this.key = key;
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		IFun obj = arguments[0];
+	public IFun invoke(Env env) throws Exception {
+		IFun obj =am.invoke(env);
 		if (obj instanceof PjArray == false && obj instanceof PjMap == false)
 			throw new Exception("bracket access can only apply to array or map, " + obj);
 
-		IFun idx = arguments[1];
+		IFun idx = key.invoke(env);
 		if (idx instanceof Value == false)
 			throw new Exception("key must be an value, " + idx);
 		
@@ -56,5 +59,10 @@ public class ArrayMap extends AbstractFun implements Assignable {
 	@Override
 	public void accept(ElementVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public IFun toAssign(IFun value) {
+		return new ArrayMapAssign(am, key, value);
 	}
 }

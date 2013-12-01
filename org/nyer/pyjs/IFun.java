@@ -11,7 +11,6 @@
 package org.nyer.pyjs;
 
 public interface IFun extends Element {
-	public IFun invoke(Env env, IFun[] arguments) throws Exception;
-	public String[] getParameters();
+	public IFun invoke(Env env) throws Exception;
 	public String getTypeStr(Env env) throws Exception;
 }

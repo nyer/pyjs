@@ -17,12 +17,12 @@ import org.nyer.pyjs.primitive.type.PjString;
 import org.nyer.pyjs.primitive.type.PjUndefined;
 
 public class TypeOf extends AbstractFun {
-	public TypeOf() {
-		super(new String[] {"expr"});
+	public TypeOf(IFun expr) {
+		super(new IFun[] {expr});
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+	public IFun invoke(Env env) throws Exception {
 		IFun arg = arguments[0];
 		if (arg instanceof Identifier) {
 			Identifier identifier = (Identifier) arg;

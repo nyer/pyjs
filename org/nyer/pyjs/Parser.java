@@ -54,6 +54,7 @@ import java.util.List;
 
 import org.nyer.pyjs.primitive.ArrayMap;
 import org.nyer.pyjs.primitive.Assignable;
+import org.nyer.pyjs.primitive.Body;
 import org.nyer.pyjs.primitive.DefFun;
 import org.nyer.pyjs.primitive.FunCall;
 import org.nyer.pyjs.primitive.Identifier;
@@ -76,7 +77,6 @@ import org.nyer.pyjs.primitive.operator.Sub;
 import org.nyer.pyjs.primitive.type.PjArray;
 import org.nyer.pyjs.primitive.type.PjBoolean;
 import org.nyer.pyjs.primitive.type.PjFloat;
-import org.nyer.pyjs.primitive.type.PjIdentifierRef;
 import org.nyer.pyjs.primitive.type.PjInteger;
 import org.nyer.pyjs.primitive.type.PjMap;
 import org.nyer.pyjs.primitive.type.PjString;
@@ -90,54 +90,54 @@ import org.nyer.pyjs.statement.While;
 public class Parser {
 	private Context context;
 	private Tokenizer tokenizer;
-	public List<Instrument> parse(String code) throws Exception {
+	public List<IFun> parse(String code) throws Exception {
 		this.context = new Context();
 		tokenizer = new Tokenizer(code);
 		return parse();
 	}
 	
-	private List<Instrument> parse() throws Exception {
+	private List<IFun> parse() throws Exception {
 		return statements();
 	}
 	
-	private List<Instrument> statements() throws Exception {
-		List<Instrument> instruments = new ArrayList<Instrument>();
+	private List<IFun> statements() throws Exception {
+		List<IFun> funs = new ArrayList<IFun>();
 		
 		while (tokenizer.hasNext()) {
-			Instrument instrument = statement();
-			if (instrument != null)
-				instruments.add(instrument);
+			IFun fun = statement();
+			if (fun != null)
+				funs.add(fun);
 		}
 		
-		return instruments;
+		return funs;
 	}
 	
-	private Instrument statement() throws Exception {
-		Instrument instrument = null;
+	private IFun statement() throws Exception {
+		IFun fun = null;
 		 if (tokenizer.peek(IF)) {
-				instrument = condClause();
-				Instrument prevClause = instrument;
-				Instrument falseInstrument = null;
+			   fun = condClause();
+				IFun prevClause = fun;
+				IFun falseFun = null;
 				while (tokenizer.peek(ELIF)) {
-					falseInstrument = condClause();
-					Cond cond = (Cond) prevClause.getFun();
-					cond.setFalseInstrument(falseInstrument);
-					prevClause = falseInstrument;
+					falseFun = condClause();
+					Cond cond = (Cond) prevClause;
+					cond.setFalseBody(falseFun);
+					prevClause = falseFun;
 				}
 				
 				if (tokenizer.peek(ELSE)) {
-					falseInstrument = condClause();
-					Cond cond = (Cond) prevClause.getFun();
-					cond.setFalseInstrument(falseInstrument);
+					falseFun = condClause();
+					Cond cond = (Cond) prevClause;
+					cond.setFalseBody(falseFun);
 				}
 			} else if (tokenizer.peek(WHILE)) {
 				context.enterLoop();
-				instrument = condClause();
+				fun = condClause();
 				context.exitLoop();
 			} else if (tokenizer.accept(FOR)) {
 				context.enterLoop();
 				tokenizer.expect(OPEN_PARENTHESIS);
-				List<Instrument> init = new ArrayList<Instrument>();
+				List<IFun> init = new ArrayList<IFun>();
 				if (tokenizer.peek(SEMICOLON) == false) {
 					init.add(expression());
 					while (tokenizer.accept(COMMA)) {
@@ -145,8 +145,9 @@ public class Parser {
 					}
 				}
 				tokenizer.expect(SEMICOLON);
+				IFun first = new Body(init.toArray(new IFun[init.size()]));
 				
-				List<Instrument> condition = new ArrayList<Instrument>();
+				List<IFun> condition = new ArrayList<IFun>();
 				if (tokenizer.peek(SEMICOLON) == false) {
 					condition.add(expression());
 					while (tokenizer.accept(COMMA)) {
@@ -154,8 +155,9 @@ public class Parser {
 					}
 				}
 				tokenizer.expect(SEMICOLON);
+				IFun second = new Body(condition.toArray(new IFun[condition.size()]));
 				
-				List<Instrument> three = new ArrayList<Instrument>();
+				List<IFun> three = new ArrayList<IFun>();
 				if (tokenizer.peek(CLOSE_PARENTHESIS) == false) {
 					three.add(expression());
 					while (tokenizer.accept(COMMA)) {
@@ -163,207 +165,210 @@ public class Parser {
 					}
 				}
 				tokenizer.expect(CLOSE_PARENTHESIS);
+				IFun last = new Body(three.toArray(new IFun[three.size()]));
 				
-				List<Instrument> body = braceBody();
+				IFun body = braceBody();
 				
-				instrument = new Instrument(new For(condition, three, body), init);
+				fun = new For(first, second, last, body);
 				context.exitLoop();
 			} else if (tokenizer.accept(BREAK)) {
 				if (context.allowBreak() == false)
 					throw new Exception("illegal break statement");
 
-				instrument = new Instrument(new Break());
+				fun = new Break();
 			} else if (tokenizer.accept(RETURN)) {
 				if (context.allowReturn() == false)
 					throw new Exception("illegal return statement");
 				
-				Instrument returnValueInstrument = null;
+				IFun returnValue = null;
 				if (tokenizer.peek(SEMICOLON) == false
 						&& tokenizer.peek(CLOSE_BRACE) == false)
-					returnValueInstrument = expression();
+					returnValue = expression();
 
-				instrument = new Instrument(new Return(), returnValueInstrument);
+				fun = new Return(returnValue);
 			} else
-				instrument = expression();
+				fun = expression();
 		 
 		 tokenizer.cleanSemiColon();
-		 return instrument;
+		 return fun;
 	}
 	
-	private Instrument expression() throws Exception {
+	private IFun expression() throws Exception {
 		return assign();
 	}
 	
-	private Instrument assign() throws Exception {
-		Instrument instrument = questionExp();
+	private IFun assign() throws Exception {
+		IFun fun = questionExp();
 		if (tokenizer.accept(ASSIGN)) {
-			IFun fun = instrument.getFun();
 			if (fun instanceof Assignable == false)
 				throw new Exception("Invalid left-hand side in assignment");
-			instrument = instrument.toAssign(assign());
+			fun = ((Assignable)fun).toAssign(assign());
 		}
 		
-		return instrument;
+		return fun;
 	}
 	
-	private Instrument questionExp() throws Exception {
-		Instrument instrument = orExp();
+	private IFun questionExp() throws Exception {
+		IFun fun = orExp();
 		if (tokenizer.accept(QUESTION)) {
-			Instrument trueInstrument = questionExp();
+			IFun trueFun = questionExp();
 			tokenizer.expect(COLON);
-			Instrument falseInstrument = questionExp();
-			instrument = new Instrument(new CondOperator(trueInstrument, falseInstrument), instrument);
+			IFun falseFun = questionExp();
+			fun = new CondOperator(fun, trueFun, falseFun);
 		}
 		
-		return instrument;
+		return fun;
 	}
 	
-	private Instrument orExp() throws Exception {
-		Instrument instrument = andExp();
+	private IFun orExp() throws Exception {
+		IFun fun = andExp();
 		while (tokenizer.accept(OR)) {
-			instrument = new Instrument(new Or(), instrument, andExp());
+			fun = new Or(fun, andExp());
 		}
 		
-		return instrument;
+		return fun;
 	}
 	
-	private Instrument andExp() throws Exception {
-		Instrument instrument = eqExp();
+	private IFun andExp() throws Exception {
+		IFun fun = eqExp();
 		while (tokenizer.accept(AND)) {
-			instrument = new Instrument(new And(), instrument, eqExp());
+			fun = new And(fun, eqExp());
 		}
 		
-		return instrument;
+		return fun;
 	}
 	
-	private Instrument eqExp() throws Exception {
-		Instrument instrument = relExp();
+	private IFun eqExp() throws Exception {
+		IFun fun = relExp();
 		while (tokenizer.peek(EQ) || tokenizer.peek(NE)) {
 			if (tokenizer.accept(EQ)) {
-				instrument = new Instrument(new EQ(), instrument, relExp());
+				fun = new EQ(fun, relExp());
 			} else if (tokenizer.accept(NE)) {
-				instrument = new Instrument(new NE(), instrument, relExp());
+				fun = new NE(fun, relExp());
 			}
 		}
-		return instrument;
+		return fun;
 	}
 
-	private Instrument relExp() throws Exception {
-		Instrument instrument = addSubExp();
+	private IFun relExp() throws Exception {
+		IFun fun = addSubExp();
 		while (tokenizer.peek(LT) || tokenizer.peek(LTE)
 				|| tokenizer.peek(GT) || tokenizer.peek(GTE)) {
 			if (tokenizer.accept(LT)) {
-				instrument = new Instrument(new LT(), instrument, addSubExp());
+				fun = new LT(fun, addSubExp());
 			} else if (tokenizer.accept(LTE)) {
-				instrument = new Instrument(new LTE(), instrument, addSubExp());
+				fun = new LTE(fun, addSubExp());
 			} else if (tokenizer.accept(GT)) {
-				instrument = new Instrument(new GT(), instrument, addSubExp());
+				fun = new GT( fun, addSubExp());
 			} else if (tokenizer.accept(GTE)) {
-				instrument = new Instrument(new GTE(), instrument, addSubExp());
+				fun = new GTE(fun, addSubExp());
 			}
 		}
-		return instrument;
+		return fun;
 	}
 	
-	private Instrument addSubExp() throws Exception {
-		Instrument instrument = multiDivExp();
+	private IFun addSubExp() throws Exception {
+		IFun fun = multiDivExp();
 		while (tokenizer.peek(PLUS) || tokenizer.peek(SUB)) {
 			if (tokenizer.accept(PLUS)) {
-				instrument = new Instrument(new Add(), instrument, multiDivExp());
+				fun = new Add(fun, multiDivExp());
 			} else if (tokenizer.accept(SUB)) {
-				instrument = new Instrument(new Sub(), instrument, multiDivExp());
+				fun = new Sub(fun, multiDivExp());
 			}
 		}
 		
-		return instrument;
+		return fun;
 	}
 	
-	private Instrument multiDivExp() throws Exception {
-		Instrument instrument = prefixExp();
+	private IFun multiDivExp() throws Exception {
+		IFun fun = prefixExp();
 		while (tokenizer.peek(MULTI) || tokenizer.peek(DIV)) {
 			if (tokenizer.accept(MULTI)) {
-				instrument = new Instrument(new Multi(), instrument, prefixExp());
+				fun = new Multi(fun, prefixExp());
 			} else if (tokenizer.accept(DIV)){
-				instrument = new Instrument(new Div(), instrument, prefixExp());
+				fun = new Div(fun, prefixExp());
 			}
 		}
 		
-		return instrument;
+		return fun;
 	}
 	
-	private Instrument prefixExp() throws Exception {
-		Instrument instrument = null;
+	private IFun prefixExp() throws Exception {
+		IFun fun = null;
 		if (tokenizer.accept(PLUS)) {
-			instrument = new Instrument(new Add(), prefixExp());
+			fun = new Add( prefixExp());
 		} else if (tokenizer.accept(SUB)) {
-			instrument = new Instrument(new Sub(), prefixExp());
+			fun = new Sub(prefixExp());
 		} else if (tokenizer.accept(NOT)) {
-			instrument = new Instrument(new Not(), prefixExp());
+			fun = new Not(prefixExp());
 		} else if (tokenizer.accept(PLUSPLUS)) {
-			instrument = prefixExp();
-			if (instrument.getFun() instanceof Assignable == false)
-				throw new Exception("variable exepcted, but found: " + instrument.getFun());
-			instrument = instrument.toAssign(new Instrument(new Add(), instrument, new Instrument(PjInteger.valueOf(1))));
+			fun = prefixExp();
+			if (fun instanceof Assignable == false)
+				throw new Exception("variable exepcted, but found: " + fun);
+			Assignable assign = (Assignable) fun;
+			fun = assign.toAssign(new Add(fun, PjInteger.valueOf(1)));
 		} else if (tokenizer.accept(SUBSUB)) {
-			instrument = prefixExp();
-			if (instrument.getFun() instanceof Assignable == false)
-				throw new Exception("variable exepcted, but found: " + instrument.getFun());
-			instrument = instrument.toAssign(new Instrument(new Sub(), instrument, new Instrument(PjInteger.valueOf(1))));
+			fun = prefixExp();
+			if (fun instanceof Assignable == false)
+				throw new Exception("variable exepcted, but found: " + fun);
+			Assignable assign = (Assignable) fun;
+			fun = assign.toAssign(new Sub(fun, PjInteger.valueOf(1)));
 		} else {
-			instrument = suffixExp();
+			fun = suffixExp();
 
 			if (tokenizer.accept(PLUSPLUS)) {
-				if (instrument.getFun() instanceof Assignable == false)
-					throw new Exception("variable exepcted, but found: " + instrument.getFun());
-				instrument = new Instrument(new Sub(), 
-						instrument.toAssign(new Instrument(new Add(), instrument, new Instrument(PjInteger.valueOf(1)))),
-						new Instrument(PjInteger.valueOf(1)));
+				if (fun instanceof Assignable == false)
+					throw new Exception("variable exepcted, but found: " + fun);
+				Assignable assign = (Assignable) fun;
+				fun = new Sub(assign.toAssign(new Add(fun, PjInteger.valueOf(1))), 
+						PjInteger.valueOf(1));
+				
 			} else if (tokenizer.accept(SUBSUB)) {
-				if (instrument.getFun() instanceof Assignable == false)
-					throw new Exception("variable exepcted, but found: " + instrument.getFun());
-				instrument = new Instrument(new Add(), 
-						instrument.toAssign(new Instrument(new Sub(), instrument, new Instrument(PjInteger.valueOf(1)))),
-						new Instrument(PjInteger.valueOf(1)));
+				if (fun instanceof Assignable == false)
+					throw new Exception("variable exepcted, but found: " + fun);
+				Assignable assign = (Assignable) fun;
+				fun = new Add(assign.toAssign(new Sub(fun, PjInteger.valueOf(1))),
+						PjInteger.valueOf(1));
 			}
 		}
 		
-		return instrument;
+		return fun;
 	}
 	
-	private Instrument suffixExp() throws Exception {
-		Instrument instrument = valueExp();
-		if (instrument.getFun().getClass() == DefFun.class)
-			return instrument;
+	private IFun suffixExp() throws Exception {
+		IFun fun = valueExp();
+		if (fun.getClass() == DefFun.class)
+			return fun;
 		
 		while (tokenizer.peek(OPEN_BRACKET) || tokenizer.peek(OPEN_PARENTHESIS)) {
 			// array or map access
 			if (tokenizer.peek(OPEN_BRACKET)) {
 				while (tokenizer.accept(OPEN_BRACKET)) {
-					Instrument posInstrument = expression();
+					IFun posFun = expression();
 					tokenizer.expect(CLOSE_BRACKET);
 					
-					instrument = new Instrument(new ArrayMap(), instrument, posInstrument);
+					fun = new ArrayMap(fun, posFun);
 				}
 			}
 
 			// funcall
 			if (tokenizer.peek(OPEN_PARENTHESIS)) {
 				while (tokenizer.accept(OPEN_PARENTHESIS)) {
-					instrument = new Instrument(new FunCall(), instrument, arguments());
+					fun = new FunCall(fun, arguments());
 					tokenizer.expect(CLOSE_PARENTHESIS);
 				}
 			}
 		}
 		
-		return instrument;
+		return fun;
 	}
 	
-	private Instrument valueExp() throws Exception {
-		Instrument instrument = null;
+	private IFun valueExp() throws Exception {
+		IFun fun = null;
 		if (tokenizer.accept(OPEN_PARENTHESIS)) {
-			instrument = expression();
+			fun = expression();
 			tokenizer.expect(CLOSE_PARENTHESIS);
-			instrument = new Instrument(new Parenthesis(), instrument);
+			fun = new Parenthesis(fun);
 		} else if (tokenizer.peek(IDENTIFIER) 
 				|| tokenizer.peek(PLUS) || tokenizer.peek(SUB)
 				|| tokenizer.peek(MULTI) || tokenizer.peek(DIV)) {
@@ -387,49 +392,46 @@ public class Parser {
 				
 				tokenizer.expect(OPEN_BRACE);
 				context.enterFunc();
-				List<Instrument> funBody = new ArrayList<Instrument>();
+				List<IFun> funBody = new ArrayList<IFun>();
 				while (tokenizer.peek(CLOSE_BRACE) == false) {
 					funBody.add(statement());
 				}
 				context.exitFunc();
 				tokenizer.expect(CLOSE_BRACE);
+				IFun body = new Body(funBody);
 				
-				instrument = new Instrument(new DefFun(parameters.toArray(new String[parameters.size()]), funBody));
+				fun = new DefFun(parameters.toArray(new String[parameters.size()]), body);
 				if (funName != null) {
-					instrument = new Instrument(new Identifier(funName)).toAssign(instrument);
+					fun = new Identifier(funName).toAssign(fun);
 				}
 				
-				return instrument;
+				return fun;
 			} else if ("typeof".equals(token.getStr())) {
 				tokenizer.expect(OPEN_PARENTHESIS);
-				Instrument exp = expression();
-				if (exp.getFun() instanceof Identifier) {
-					Identifier identifier = (Identifier) exp.getFun();
-					exp = new Instrument(new PjIdentifierRef(identifier));
-				}
+				IFun exp = expression();
 				
-				instrument = new Instrument(new TypeOf(), exp);
+				fun = new TypeOf(exp);
 				tokenizer.expect(CLOSE_PARENTHESIS);
 			} else if ("undefined".equals(token.getStr())) {
-				instrument = new Instrument(new PjUndefined());
+				fun = new PjUndefined();
 			} else {
-				instrument = new Instrument(new Identifier(token.getStr()));
+				fun = new Identifier(token.getStr());
 			}
 		} else if (tokenizer.peek(BOOLEAN)) {
 			Token token = tokenizer.nextToken();
-			instrument = new Instrument(new PjBoolean(java.lang.Boolean.valueOf(token.getStr())));
+			fun = new PjBoolean(java.lang.Boolean.valueOf(token.getStr()));
 		} else if (tokenizer.peek(INTEGER)) {
 			Token token = tokenizer.nextToken();
-			instrument = new Instrument(new PjInteger(java.lang.Integer.valueOf(token.getStr())));
+			fun = new PjInteger(java.lang.Integer.valueOf(token.getStr()));
 		} else if (tokenizer.peek(FLOAT)) {
 			Token token = tokenizer.nextToken();
-			instrument = new Instrument(new PjFloat(java.lang.Float.valueOf(token.getStr())));
+			fun = new PjFloat(java.lang.Float.valueOf(token.getStr()));
 		} else if (tokenizer.peek(STRING)) {
 			Token token = tokenizer.nextToken();
-			instrument = new Instrument(new PjString(token.getStr()));
+			fun = new PjString(token.getStr());
 		} else if (tokenizer.accept(OPEN_BRACKET)) {
 			// array
-			List<Instrument> arguments = new ArrayList<Instrument>();
+			List<IFun> arguments = new ArrayList<IFun>();
 			if (tokenizer.peek(CLOSE_BRACKET) == false) {
 				arguments.add(expression());
 				while (tokenizer.accept(COMMA)) {
@@ -437,10 +439,10 @@ public class Parser {
 				}
 			}
 			tokenizer.expect(CLOSE_BRACKET);
-			instrument = new Instrument(new PjArray(), arguments);
+			fun = new PjArray(arguments.toArray(new IFun[arguments.size()]));
 		} else if (tokenizer.accept(OPEN_BRACE)) {
 			// map
-			List<Instrument> arguments = new ArrayList<Instrument>();
+			List<IFun> arguments = new ArrayList<IFun>();
 			if (tokenizer.peek(CLOSE_BRACE) == false) {
 				arguments.add(expression());
 				tokenizer.expect(COLON);
@@ -452,19 +454,19 @@ public class Parser {
 				}
 			}
 			tokenizer.expect(CLOSE_BRACE);
-			instrument = new Instrument(new PjMap(), arguments);
+			fun = new PjMap(arguments.toArray(new IFun[arguments.size()]));
 		}
 
-		if (instrument != null)
-			return instrument;
+		if (fun != null)
+			return fun;
 		
 		if (tokenizer.hasNext() == false)
 			throw new Exception("unexpected EOF");
 		throw new Exception("unexpected token: " + tokenizer.nextToken());
 	}
 
-	private List<Instrument> arguments() throws Exception {
-		List<Instrument> arguments = new ArrayList<Instrument>();
+	private IFun[] arguments() throws Exception {
+		List<IFun> arguments = new ArrayList<IFun>();
 		if (tokenizer.peek(CLOSE_PARENTHESIS) == false) {
 			arguments.add(expression());
 			while (tokenizer.accept(COMMA)) {
@@ -472,11 +474,11 @@ public class Parser {
 			}
 		}
 		
-		return arguments;
+		return arguments.toArray(new IFun[arguments.size()]);
 	}
 
-	private List<Instrument> braceBody() throws Exception {
-		List<Instrument> body = new ArrayList<Instrument>();
+	private IFun braceBody() throws Exception {
+		List<IFun> body = new ArrayList<IFun>();
 		if (tokenizer.accept(OPEN_BRACE)) {
 			while (tokenizer.peek(CLOSE_BRACE) == false) {
 				body.add(statement());
@@ -486,16 +488,16 @@ public class Parser {
 			body.add(statement());
 		}
 		
-		return body;
+		return new Body(body.toArray(new IFun[body.size()]));
 	}
 	
-	private Instrument condClause() throws Exception {
+	private IFun condClause() throws Exception {
 		Token token = tokenizer.nextToken();
 		TokenType tokenType = token.getTokenType();
-		Instrument condition = null;
+		IFun condition = null;
 		
 		if (tokenType== ELSE) {
-			condition = new Instrument(PjBoolean.True);
+			condition = PjBoolean.True;
 		} else if (tokenType == IF || tokenType == ELIF || tokenType == WHILE) {
 			tokenizer.expect(OPEN_PARENTHESIS);
 			condition = expression();
@@ -503,21 +505,21 @@ public class Parser {
 		} else
 			throw new Exception("unexpected token,  " + token);
 		
-		List<Instrument> trueInstruments = braceBody();
+		IFun trueBody = braceBody();
 		
 		if (token.getTokenType() == WHILE) 
-			return new Instrument(new While(condition, trueInstruments));
+			return new While(condition, trueBody);
 		else
-			return new Instrument(new Cond(trueInstruments, null), condition);
+			return new Cond(condition, trueBody, null);
 	}
 	
 	public static void main(String[] args) throws Exception {
 		String code = "a = 3; b = a + 5; c = function(e) {println(e)}; c(b)";
 		
 		Parser parser = new Parser();
-		List<Instrument> instruments = parser.parse(code);
-		for (Instrument instrument : instruments) {
-			System.out.println(instrument);
+		List<IFun> funs = parser.parse(code);
+		for (IFun fun : funs) {
+			System.out.println(fun);
 		}
 	}
 }

@@ -17,14 +17,13 @@ import org.nyer.pyjs.primitive.type.PjBoolean;
 
 public class Not extends ValueOp {
 
-	public Not() {
-		super(new String[] {"boolean expr"});
+	public Not(IFun argument) {
+		super(new IFun[] {argument});
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		IFun arg = arguments[0];
-		Boolean value = checkBoolOperand(env, arg);
+	public IFun invokeIntern(Env env, IFun[] arguments) throws Exception {
+		Boolean value = checkBoolOperand(arguments[0]);
 		
 		return PjBoolean.valueOf(!value);
 	}

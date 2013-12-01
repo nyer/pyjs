@@ -18,11 +18,11 @@ import org.nyer.pyjs.primitive.type.Value;
 public class Identifier extends Value implements Assignable {
 
 	public Identifier(String value) {
-		super("identifier",  value);
+		super( value);
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+	public IFun invoke(Env env) throws Exception {
 		String name = getValue();
 		IFun obj = env.lookUp(name);
 		if (obj == null)
@@ -40,11 +40,16 @@ public class Identifier extends Value implements Assignable {
 	public String getTypeStr(Env env) throws Exception {
 		if (env == null)
 			return "unknow";
-		return this.invoke(env, (IFun[])null).getTypeStr(env);
+		return this.invoke(env).getTypeStr(env);
 	}
 	
 	@Override
 	public void accept(ElementVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public IFun toAssign(IFun value) {
+		return new IdentifierAssign(this, value);
 	}
 }

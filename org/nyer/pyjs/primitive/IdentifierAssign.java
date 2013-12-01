@@ -6,17 +6,18 @@ import org.nyer.pyjs.IFun;
 
 public class IdentifierAssign extends AbstractFun {
 	private Identifier identifier;
-	public IdentifierAssign(Identifier identifier) {
-		super(new String[] {"identifier"});
+	private IFun value;
+	public IdentifierAssign(Identifier identifier, IFun value) {
 		this.identifier = identifier;
+		this.value = value;
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		IFun value = arguments[0];
-		env.put(identifier.getValue(), value);
+	public IFun invoke(Env env) throws Exception {
+		IFun arg = value.invoke(env);
+		env.put(identifier.getValue(), arg);
 		
-		return value;
+		return arg;
 	}
 
 	@Override

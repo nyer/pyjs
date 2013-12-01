@@ -10,21 +10,20 @@
 
 package org.nyer.pyjs.primitive;
 
-import java.util.Arrays;
-
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
+import org.nyer.pyjs.primitive.type.PjBoolean;
+import org.nyer.pyjs.primitive.type.PjFloat;
+import org.nyer.pyjs.primitive.type.PjInteger;
+import org.nyer.pyjs.primitive.type.Value;
 
 public abstract class AbstractFun implements IFun {
-	public String[] parameters;
+	protected IFun[] arguments;
 	
-	public AbstractFun(String[] parameters) {
-		this.parameters = parameters;
-	}
+	public AbstractFun() {}
 	
-	@Override
-	public String[] getParameters() {
-		return parameters;
+	public AbstractFun(IFun... arguments) {
+		this.arguments = arguments;
 	}
 	
 	@Override
@@ -32,9 +31,32 @@ public abstract class AbstractFun implements IFun {
 		return "function";
 	}
 	
-	@Override
-	public String toString() {
-		return "Function [parameters="
-				+ Arrays.toString(parameters) + "]";
+	protected void checkOperand(IFun argument) throws Exception {
+		if (argument instanceof Value == false)
+			throw new Exception("Value expected, but found: " + argument);
+		
+	}
+	protected Number checkNumOperand( IFun argument) throws Exception {
+		checkOperand(argument);
+		if (argument instanceof PjInteger || argument instanceof PjFloat)
+			return (Number) ((Value)argument).getValue();
+		
+		throw new Exception("number expected, but " + argument + " founded");
+	}
+	
+	protected Boolean checkBoolOperand( IFun argument) throws Exception {
+		checkOperand(argument);
+		if (argument instanceof PjBoolean)
+			return (Boolean) ((Value)argument).getValue();
+		
+		throw new Exception("boolean expected, but " + argument + " founded");
+	}
+	
+	protected IFun[] evalArguments(IFun[] arguments, Env env)  throws Exception {
+		IFun[] evaled = new IFun[arguments.length];
+		for (int i = 0,  s = arguments.length; i < s; i ++)
+			evaled[i] = arguments[i].invoke(env);
+		
+		return evaled;
 	}
 }

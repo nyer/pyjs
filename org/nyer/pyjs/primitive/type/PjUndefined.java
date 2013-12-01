@@ -16,7 +16,7 @@ import org.nyer.pyjs.Env;
 public class PjUndefined extends Value {
 
 	public PjUndefined() {
-		super(null, "");
+		super("");
 	}
 	
 	@Override

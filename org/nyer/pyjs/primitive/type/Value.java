@@ -17,13 +17,14 @@ import org.nyer.pyjs.primitive.AbstractFun;
 public abstract class Value extends AbstractFun {
 	protected Object value;
 	
-	public Value(String parameter, Object value) {
-		super(new String[] {parameter});
+	public Value() {}
+	
+	public Value(Object value) {
 		this.value = value;
 	}
 	
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+	public IFun invoke(Env env) throws Exception {
 		return this;
 	}
 	

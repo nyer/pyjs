@@ -17,12 +17,12 @@ import org.nyer.pyjs.primitive.type.PjBoolean;
 
 public class EQ extends ValueOp {
 
-	public EQ() {
-		super(new String[] {"number", "number"});
+	public EQ(IFun expr1, IFun expr2) {
+		super(expr1, expr2);
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+	public IFun invokeIntern(Env env, IFun[] arguments) throws Exception {
 		Object op1 = arguments[0];
 		Object op2 = arguments[1];
 		

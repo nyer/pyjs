@@ -16,7 +16,7 @@ import org.nyer.pyjs.Env;
 
 public class PjBoolean extends Value  {
 	public PjBoolean(boolean bool) {
-		super("boolean str", bool);
+		super(bool);
 	}
 	
 	@Override

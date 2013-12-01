@@ -16,14 +16,14 @@ import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.PjUndefined;
 
 public class Println extends AbstractFun {
-	public Println() {
-		super(new String[] {"op1"});
+	public Println(IFun argument) {
+		super(argument);
 	}
 	
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+	public IFun invoke(Env env) throws Exception {
 		if (arguments.length > 0)
-			System.out.println(arguments[0]);
+			System.out.println(arguments[0].invoke(env));
 		else
 			System.out.println();
 		return new PjUndefined();

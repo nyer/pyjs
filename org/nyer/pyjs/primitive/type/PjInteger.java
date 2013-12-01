@@ -17,7 +17,7 @@ import org.nyer.pyjs.Env;
 public class PjInteger extends Value  {
 
 	public PjInteger(int value) {
-		super("integer str", value);
+		super(value);
 	}
 	
 	@Override

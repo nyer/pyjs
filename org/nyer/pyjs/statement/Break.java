@@ -18,11 +18,10 @@ import org.nyer.pyjs.primitive.AbstractFun;
 public class Break extends AbstractFun {
 
 	public Break() {
-		super(new String[]{});
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+	public IFun invoke(Env env) throws Exception {
 		throw new Exception("break must be in a loop");
 	}
 

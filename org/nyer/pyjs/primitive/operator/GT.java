@@ -16,15 +16,14 @@ import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.PjBoolean;
 
 public class GT extends ValueOp {
-
-	public GT() {
-		super(new String[] {"number", "number"});
+	public GT(IFun... arguments) {
+		super(arguments);
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		Number op1 = checkNumOperand(env, arguments[0]);
-		Number op2 = checkNumOperand(env, arguments[1]);
+	public IFun invokeIntern(Env env, IFun[] arguments) throws Exception {
+		Number op1 = checkNumOperand(arguments[0]);
+		Number op2 = checkNumOperand(arguments[1]);
 		
 		if (op1 instanceof Integer && op2 instanceof Integer) {
 			Integer v1 = (Integer) op1;

@@ -16,7 +16,7 @@ import org.nyer.pyjs.Env;
 public class PjString extends Value {
 
 	public PjString(String value) {
-		super("string", value);
+		super( value);
 	}
 
 	@Override

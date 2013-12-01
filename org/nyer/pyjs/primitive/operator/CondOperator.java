@@ -13,25 +13,39 @@ package org.nyer.pyjs.primitive.operator;
 import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
-import org.nyer.pyjs.Instrument;
+import org.nyer.pyjs.primitive.AbstractFun;
 
-public class CondOperator extends ValueOp {
-	private Instrument trueInstrument;
-	private Instrument falseInstrument;
+public class CondOperator extends AbstractFun {
+	private IFun condition;
+	private IFun trueBody;
+	private IFun falseBody;
 	
-	public CondOperator(Instrument trueInstrument, Instrument falseInstrument) {
-		super(new String[] {"boolean expr"});
-		this.trueInstrument = trueInstrument;
-		this.falseInstrument = falseInstrument;
+	public CondOperator(IFun condition, IFun trueBody, IFun falseBody) {
+		this.condition = condition;
+		this.trueBody = trueBody;
+		this.falseBody = falseBody;
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		Boolean arg = checkBoolOperand(env, arguments[0]);
+	public IFun invoke(Env env) throws Exception {
+		Boolean arg = checkBoolOperand(condition.invoke(env));
 		if (arg)
-			return trueInstrument.invoke(env);
-		else
-			return falseInstrument.invoke(env);
+			return trueBody.invoke(env);
+		else 
+			return falseBody.invoke(env);
+	}
+
+	
+	public IFun getFalseBody() {
+		return falseBody;
+	}
+
+	public IFun getCondition() {
+		return condition;
+	}
+
+	public IFun getTrueBody() {
+		return trueBody;
 	}
 
 	@Override

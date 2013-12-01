@@ -18,13 +18,8 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 import org.nyer.pyjs.Env;
-import org.nyer.pyjs.Instrument;
+import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.Parser;
-import org.nyer.pyjs.primitive.Println;
-import org.nyer.pyjs.primitive.operator.Add;
-import org.nyer.pyjs.primitive.operator.Div;
-import org.nyer.pyjs.primitive.operator.Multi;
-import org.nyer.pyjs.primitive.operator.Sub;
 
 
 public class Interpreter {
@@ -36,21 +31,16 @@ public class Interpreter {
 	}
 	
 	private void init() {
-		env.put("+", new Add());
-		env.put("-", new Sub());
-		env.put("/", new Div());
-		env.put("*", new Multi());
-		env.put("println", new Println());
 	}
 	
-	public List<Instrument> parse(String code) throws Exception {
+	public List<IFun> parse(String code) throws Exception {
 		return parser.parse(code);
 	}
 	
-	public Object run(List<Instrument> instruments) throws Exception {
+	public Object run(List<IFun> funs) throws Exception {
 		Object ret = null;
-		for (Instrument instrument : instruments) {
-			ret = instrument.invoke(env);
+		for (IFun fun : funs) {
+			ret = fun.invoke(env);
 		}
 		
 		return ret;

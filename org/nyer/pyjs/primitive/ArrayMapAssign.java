@@ -21,19 +21,24 @@ import org.nyer.pyjs.primitive.type.PjMap;
 import org.nyer.pyjs.primitive.type.Value;
 
 public class ArrayMapAssign extends AbstractFun {
-
-	public ArrayMapAssign() {
-		super(new String[] {"array", "integer expr"});
+	private IFun am;
+	private IFun key;
+	private IFun value;
+	
+	public ArrayMapAssign(IFun am, IFun key, IFun value) {
+		this.am = am;
+		this.key = key;
+		this.value = value;
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		IFun obj = arguments[0];
+	public IFun invoke(Env env) throws Exception {
+		IFun obj = am.invoke(env);
 		if (obj instanceof PjArray == false && obj instanceof PjMap == false)
 			throw new Exception("bracket access can only apply to array or map, " + obj);
 
-		IFun right = arguments[2];
-		IFun idx = arguments[1];
+		IFun right =value.invoke(env);
+		IFun idx = key.invoke(env);
 		if (idx instanceof Value == false)
 			throw new Exception("key must be an value, " + idx);
 		

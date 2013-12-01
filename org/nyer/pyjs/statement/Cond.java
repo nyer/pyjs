@@ -10,41 +10,50 @@
 
 package org.nyer.pyjs.statement;
 
-import java.util.List;
-
 import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
-import org.nyer.pyjs.Instrument;
-import org.nyer.pyjs.primitive.operator.ValueOp;
+import org.nyer.pyjs.primitive.AbstractFun;
 import org.nyer.pyjs.primitive.type.PjUndefined;
 
-public class Cond extends ValueOp {
-	private Instrument[] trueInstruments;
-	private Instrument falseInstrument;
-	public Cond(List<Instrument> trueInstruments, Instrument falseInstrument) {
-		super(new String[] {"boolean"});
-		this.trueInstruments = trueInstruments.toArray(new Instrument[trueInstruments.size()]);
-		this.falseInstrument = falseInstrument;
+public class Cond extends AbstractFun {
+	private IFun condition;
+	private IFun trueBody;
+	private IFun falseBody;
+	
+	public Cond(IFun condition, IFun trueBody, IFun falseBody) {
+		this.condition = condition;
+		this.trueBody = trueBody;
+		this.falseBody = falseBody;
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		boolean condition = checkBoolOperand(env, arguments[0]);
+	public IFun invoke(Env env) throws Exception {
+		boolean cond = checkBoolOperand(condition.invoke(env));
 		IFun ret = new PjUndefined();
-		if (condition) {
-			for (int i = 0, s = trueInstruments.length;i < s;i ++) {
-				ret = trueInstruments[i].invoke(env);
-			}
-		} else if (falseInstrument != null) {
-			ret = falseInstrument.invoke(env);
+		if (cond) {
+			ret = trueBody.invoke(env);
+		} else if (falseBody != null) {
+			ret = falseBody.invoke(env);
 		}
 		
 		return ret;
 	}
 	
-	public void setFalseInstrument(Instrument instrument) {
-		this.falseInstrument = instrument;
+	public IFun getFalseBody() {
+		return falseBody;
+	}
+
+	public void setFalseBody(IFun falseBody) {
+		this.falseBody = falseBody;
+	}
+
+	public IFun getCondition() {
+		return condition;
+	}
+
+	public IFun getTrueBody() {
+		return trueBody;
 	}
 	
 	@Override

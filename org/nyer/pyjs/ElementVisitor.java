@@ -19,8 +19,6 @@ import org.nyer.pyjs.statement.*;
 
 
 public interface ElementVisitor {
-	void visit(Instrument ele);
-	
 	void visit(ArrayMapAssign ele);
 	void visit(ArrayMap ele);
 	

@@ -28,12 +28,13 @@ public class Env {
 		map.put(identifier, value);
 	}
 	
-	public Env extend(String[] identifiers, IFun[] values) {
+	public Env extend(String[] parameters, IFun[] values)  throws Exception {
 		Env env = new Env(this);
 		env.map = new HashMap<String, IFun>();
-		if (identifiers != null) {
-			for (int i = 0, s = identifiers.length;i < s;i ++) {
-				env.put(identifiers[i], values[i]);
+		if (parameters != null) {
+			for (int i = 0, s = parameters.length;i < s;i ++) {
+				String key = parameters[i];
+				env.put(key, values[i]);
 			}
 		}
 		

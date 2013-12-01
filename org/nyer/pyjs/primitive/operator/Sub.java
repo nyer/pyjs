@@ -17,23 +17,23 @@ import org.nyer.pyjs.primitive.type.PjFloat;
 import org.nyer.pyjs.primitive.type.PjInteger;
 
 public class Sub extends ValueOp {
-	public Sub() {
-		super(new String[] {"op1", "op2"});
+	public Sub(IFun... arguments) {
+		super(arguments);
 	}
 	
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+	public IFun invokeIntern(Env env, IFun[] arguments) throws Exception {
 		if (arguments.length == 1) {
 			IFun arg1 = arguments[0];
-			Number value = checkNumOperand(env, arg1);
+			Number value = checkNumOperand(arg1);
 			if (value instanceof Integer) {
 				return new PjInteger(- value.intValue());
 			} else {
 				return new PjFloat(- value.floatValue());
 			}
 		} else {
-			Number op1 = checkNumOperand(env, arguments[0]);
-			Number op2 = checkNumOperand(env, arguments[1]);
+			Number op1 = checkNumOperand(arguments[0]);
+			Number op2 = checkNumOperand(arguments[1]);
 			
 			if (op1 instanceof Integer && op2 instanceof Integer) {
 				Integer v1 = (Integer) op1;

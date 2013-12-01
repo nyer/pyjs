@@ -19,15 +19,15 @@ import org.nyer.pyjs.primitive.type.PjString;
 import org.nyer.pyjs.primitive.type.Value;
 
 public class Add extends ValueOp {
-	public Add() {
-		super(new String[] {"op1", "op2"});
+	public Add(IFun... arguments) {
+		super(arguments);
 	}
 	
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+	public IFun invokeIntern(Env env, IFun[] arguments) throws Exception {
 		if (arguments.length == 1) {
 			IFun arg1 = arguments[0];
-			Number value = checkNumOperand(env, arg1);
+			Number value = checkNumOperand( arg1);
 			if (value instanceof Integer) {
 				return new PjInteger(+ value.intValue());
 			} else {
@@ -37,15 +37,15 @@ public class Add extends ValueOp {
 			IFun arg1 = arguments[0];
 			IFun arg2 = arguments[1];
 			if (arg1 instanceof PjString || arg2 instanceof PjString) {
-				checkOperand(env, arg1);
+				checkOperand(arg1);
 				Value v1 = (Value) arg1;
-				checkOperand(env, arg2);
+				checkOperand(arg2);
 				Value v2 = (Value) arg2;
 				
 				return new PjString(String.valueOf(v1.getValue()) + String.valueOf(v2.getValue()));
 			} else {
-				Number op1 = checkNumOperand(env, arg1);
-				Number op2 = checkNumOperand(env, arg2);
+				Number op1 = checkNumOperand(arg1);
+				Number op2 = checkNumOperand(arg2);
 				
 				if (op1 instanceof Integer && op2 instanceof Integer) {
 					Integer v1 = (Integer) op1;

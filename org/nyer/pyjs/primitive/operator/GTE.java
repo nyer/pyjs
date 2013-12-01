@@ -13,22 +13,18 @@ package org.nyer.pyjs.primitive.operator;
 import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
-import org.nyer.pyjs.primitive.type.PjBoolean;
+import org.nyer.pyjs.primitive.AbstractFun;
 
-public class GTE extends ValueOp {
+public class GTE extends AbstractFun {
 
-	public GTE() {
-		super(new String[] {"number", "number"});
+	public GTE(IFun... arguments) {
+		super(arguments);
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		IFun func = new LT();
-		boolean v = checkBoolOperand(env, func.invoke(env, arguments)) ;
-		if (v)
-			return PjBoolean.False;
-		else
-			return PjBoolean.True;
+	public IFun invoke(Env env) throws Exception {
+		IFun func = new LT(arguments);
+		return  new Not(func).invoke(env);
 	}
 
 	@Override

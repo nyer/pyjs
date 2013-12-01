@@ -14,9 +14,8 @@ import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.nyer.pyjs.Instrument;
+import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.Parser;
-import org.nyer.pyjs.Tokenizer;
 import org.nyer.pyjs.interpreter.Interpreter;
 
 public class TestCase {
@@ -58,9 +57,9 @@ public class TestCase {
 		System.out.println(System.currentTimeMillis() - start);
 		String code = "a = 10000000; while (a > 0) {a = a -1}";
 		Parser parser = new Parser();
-		List<Instrument> instruments = parser.parse(code);
+		List<IFun> funs = parser.parse(code);
 		start = System.currentTimeMillis();
-		interpreter.run(instruments);
+		interpreter.run(funs);
 		System.out.println(System.currentTimeMillis() - start);
 	}
 }

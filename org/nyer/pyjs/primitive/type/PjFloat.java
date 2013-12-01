@@ -15,7 +15,7 @@ import org.nyer.pyjs.Env;
 
 public class PjFloat extends Value {
 	public PjFloat(float value) {
-		super("float str", value);
+		super(value);
 	}
 
 	@Override

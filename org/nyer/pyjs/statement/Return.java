@@ -13,25 +13,21 @@ package org.nyer.pyjs.statement;
 import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
-import org.nyer.pyjs.primitive.AbstractFun;
-import org.nyer.pyjs.primitive.type.PjUndefined;
+import org.nyer.pyjs.primitive.operator.ValueOp;
 
-public class Return extends AbstractFun {
-	public Return() {
-		super(new String[] {"one or zero value"});
+public class Return extends ValueOp {
+	public Return(IFun argument) {
+		super(new IFun[] {argument});
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		IFun ret = new PjUndefined();
-		if (arguments.length > 0)
-			ret = arguments[0];
-		
-		return ret;
+	public IFun invokeIntern(Env env, IFun[] arguments) throws Exception {
+		return arguments[0];
 	}
 	
 	@Override
 	public void accept(ElementVisitor visitor) {
 		visitor.visit(this);
 	}
+	
 }

@@ -10,51 +10,33 @@
 
 package org.nyer.pyjs.primitive;
 
-import java.util.List;
+import java.util.Arrays;
 
 import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
-import org.nyer.pyjs.Instrument;
-import org.nyer.pyjs.primitive.type.PjUndefined;
 
 public class DefFun extends AbstractFun {
-	protected Instrument[] instruments;
-	public DefFun(String[] parameters, List<Instrument> instruments) {
-		super(parameters);
-		this.instruments = instruments.toArray(new Instrument[instruments.size()]);
+	private String[] parameters;
+	private IFun body;
+	public DefFun(String[] parameters, IFun body) {
+		this.parameters = parameters;
+		this.body = body;
 	}
 	
 	@Override
-	public IFun invoke(final Env closure, IFun[] arguments) throws Exception {
-		IFun func = new AbstractFun(getParameters()) {
-			
-			@Override
-			public IFun invoke(Env env, IFun[] arguments) throws Exception {
-				Env newEnv = closure.extend(getParameters(), arguments);
-				IFun ret = new PjUndefined();
-				Instrument[] instruments = DefFun.this.instruments;
-				for (int i = 0, s = instruments.length;i < s;i ++) {
-					Instrument instrument = instruments[i];
-					ret = instrument.invoke(newEnv);
-				}
-				return ret;
-			}
-			
-			@Override
-			public void accept(ElementVisitor visitor) {
-			}
-		};
-		
+	public IFun invoke(final Env closure) throws Exception {
+		IFun func =new AnonymousFun(parameters, body);
 		return func;
-	}
-	
-	public Instrument[] getInstruments() {
-		return instruments;
 	}
 	
 	@Override
 	public void accept(ElementVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	@Override
+	public String toString() {
+		return "function [parameters=" + Arrays.toString(parameters) + "]";
 	}
 }

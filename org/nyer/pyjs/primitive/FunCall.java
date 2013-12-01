@@ -15,20 +15,30 @@ import java.util.Arrays;
 import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
-import org.nyer.pyjs.primitive.type.Value;
 
 public class FunCall extends AbstractFun {
-	public FunCall() {
-		super(null);
+	private IFun func;
+	private IFun[] arguments;
+	public FunCall(IFun func, IFun[] arguments) {
+		this.func = func;
+		this.arguments = arguments;
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		IFun func = arguments[0];
-		if (func instanceof Value)
-			throw new Exception("value cannot be invoked, " + func);
+	public IFun invoke(Env env) throws Exception {
+		func = func.invoke(env);
+		if (func instanceof AnonymousFun == false)
+			throw new Exception("function expected , but given:  " + func);
+		AnonymousFun anonymousFun = (AnonymousFun) func;
+
+		IFun[] evaled = evalArguments(arguments, env);
 		
-		return func.invoke(env, Arrays.copyOfRange(arguments, 1, arguments.length));
+		String[] parameters = anonymousFun.getParameters();
+		if (parameters.length != arguments.length)
+			throw new Exception("expected " + parameters.length + ", but given " + Arrays.toString(evaled));
+		
+		env = env.extend(parameters, evaled);
+		return func.invoke(env);
 	}
 	
 	@Override

@@ -10,36 +10,29 @@
 
 package org.nyer.pyjs.statement;
 
-import java.util.List;
-
 import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
-import org.nyer.pyjs.Instrument;
-import org.nyer.pyjs.primitive.operator.ValueOp;
+import org.nyer.pyjs.primitive.AbstractFun;
 import org.nyer.pyjs.primitive.type.PjUndefined;
 
-public class While extends ValueOp {
-	private Instrument conditionInstrument;
-	private Instrument[] trueInstruments;
-	public While(Instrument conditionInstrument, List<Instrument> trueInstruments) {
-		super(new String[] {"boolean expression"});
-		this.conditionInstrument = conditionInstrument;
-		this.trueInstruments = trueInstruments.toArray(new Instrument[trueInstruments.size()]);
+public class While extends AbstractFun {
+	private IFun condition;
+	private IFun trueBody;
+	
+	public While(IFun condition, IFun trueBody) {
+		this.condition = condition;
+		this.trueBody = trueBody;
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		boolean condition = checkBoolOperand(env, conditionInstrument.invoke(env));
+	public IFun invoke(Env env) throws Exception {
+		boolean cond = checkBoolOperand(condition.invoke(env));
 
 		IFun ret = new PjUndefined();
-		while (condition) {
-			for (int i = 0, s = trueInstruments.length;i < s;i ++) {
-				Instrument instrument = trueInstruments[i];
-				ret = instrument.invoke(env);
-			}
-			
-			condition = checkBoolOperand(env, conditionInstrument.invoke(env));
+		while (cond) {
+			ret = trueBody.invoke(env);
+			cond = checkBoolOperand(condition.invoke(env));
 		}
 		
 		return ret;
@@ -48,5 +41,13 @@ public class While extends ValueOp {
 	@Override
 	public void accept(ElementVisitor visitor) {
 		visitor.visit(this);
+	}
+
+	public IFun getCondition() {
+		return condition;
+	}
+
+	public IFun getTrueBody() {
+		return trueBody;
 	}
 }

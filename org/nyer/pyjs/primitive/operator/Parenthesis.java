@@ -16,12 +16,12 @@ import org.nyer.pyjs.IFun;
 
 public class Parenthesis extends ValueOp {
 
-	public Parenthesis() {
-		super(new String[] {"expr"});
+	public Parenthesis(IFun argument) {
+		super(new IFun[] {argument});
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
+	public IFun invokeIntern(Env env, IFun[] arguments) throws Exception {
 		return arguments[0];
 	}
 	

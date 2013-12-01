@@ -13,19 +13,22 @@ package org.nyer.pyjs.primitive.operator;
 import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
+import org.nyer.pyjs.primitive.AbstractFun;
 import org.nyer.pyjs.primitive.type.PjBoolean;
 
-public class And extends ValueOp {
-
-	public And() {
-		super(new String[] {"boolean", "boolean"});
+public class And extends AbstractFun {
+	private IFun expr1;
+	private IFun expr2;
+	public And(IFun expr1, IFun expr2) {
+		this.expr1 = expr1;
+		this.expr2 = expr2;
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		boolean v = checkBoolOperand(env, arguments[0]);
+	public IFun invoke(Env env) throws Exception {
+		boolean v = checkBoolOperand(expr1.invoke(env));
 		if (v) {
-			v = checkBoolOperand(env, arguments[0]);
+			v = checkBoolOperand(expr2.invoke(env));
 			if (v) {
 				return PjBoolean.True;
 			}

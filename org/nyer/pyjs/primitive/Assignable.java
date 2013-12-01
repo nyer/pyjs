@@ -10,6 +10,9 @@
 
 package org.nyer.pyjs.primitive;
 
+import org.nyer.pyjs.IFun;
+
 
 public interface Assignable {
+	IFun toAssign(IFun value);
 }

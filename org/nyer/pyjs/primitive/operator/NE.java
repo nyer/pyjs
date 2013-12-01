@@ -13,21 +13,18 @@ package org.nyer.pyjs.primitive.operator;
 import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
-import org.nyer.pyjs.primitive.type.PjBoolean;
+import org.nyer.pyjs.primitive.AbstractFun;
 
-public class NE extends ValueOp {
+public class NE extends AbstractFun {
 
-	public NE() {
-		super(new String[] {"number", "number"});
+	public NE(IFun... arguments) {
+		super(arguments);
 	}
 
 	@Override
-	public IFun invoke(Env env, IFun[] arguments) throws Exception {
-		EQ eq = new EQ();
-		boolean v = checkBoolOperand(env, eq.invoke(env, arguments)) ;
-		if (v)
-			return PjBoolean.False;
-		return PjBoolean.True;
+	public IFun invoke(Env env) throws Exception {
+		EQ eq = new EQ(arguments[0], arguments[1]);
+		return new Not(eq).invoke(env);
 	}
 	
 	@Override
