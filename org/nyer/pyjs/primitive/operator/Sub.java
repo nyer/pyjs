@@ -27,9 +27,9 @@ public class Sub extends ValueOp {
 			IFun arg1 = arguments[0];
 			Number value = checkNumOperand(arg1);
 			if (value instanceof Integer) {
-				return new PjInteger(- value.intValue());
+				return PjInteger.valueOf(- value.intValue());
 			} else {
-				return new PjFloat(- value.floatValue());
+				return PjFloat.valueOf(- value.floatValue());
 			}
 		} else {
 			Number op1 = checkNumOperand(arguments[0]);

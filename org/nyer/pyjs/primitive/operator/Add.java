@@ -29,9 +29,9 @@ public class Add extends ValueOp {
 			IFun arg1 = arguments[0];
 			Number value = checkNumOperand( arg1);
 			if (value instanceof Integer) {
-				return new PjInteger(+ value.intValue());
+				return PjInteger.valueOf(+ value.intValue());
 			} else {
-				return new PjFloat(+ value.floatValue());
+				return PjFloat.valueOf(+ value.floatValue());
 			}
 		} else {
 			IFun arg1 = arguments[0];

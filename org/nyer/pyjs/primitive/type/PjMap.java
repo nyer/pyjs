@@ -20,19 +20,18 @@ import org.nyer.pyjs.IFun;
 public class PjMap extends Value {
 
 	public PjMap(IFun[] arguments) {
-		this.arguments = arguments;
+		super(arguments);
 	}
 	
 	@Override
-	public IFun invoke(Env env) throws Exception {
+	public Object toValue(Env env, Object rawValue) throws Exception {
+		IFun[] arguments = (IFun[]) rawValue;
 		Map<Object, Object> map = new HashMap<Object, Object>();
 		for (int i = 0, s= arguments.length;i < s;i += 2) {
 			map.put(arguments[i].invoke(env), arguments[i + 1].invoke(env));
 		}
 		
-		this.value = map;
-		
-		return this;
+		return map;
 	}
 	
 	@Override

@@ -38,12 +38,12 @@ public class Interpreter {
 	}
 	
 	public Object run(List<IFun> funs) throws Exception {
-		Object ret = null;
+		IFun ret = null;
 		for (IFun fun : funs) {
 			ret = fun.invoke(env);
 		}
 		
-		return ret;
+		return ret.invoke(env);
 	}
 	
 	public Object run(String code) throws Exception {

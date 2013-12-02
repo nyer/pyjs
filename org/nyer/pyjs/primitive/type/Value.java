@@ -16,20 +16,27 @@ import org.nyer.pyjs.primitive.AbstractFun;
 
 public abstract class Value extends AbstractFun {
 	protected Object value;
+	protected Object rawValue;
 	
-	public Value() {}
-	
-	public Value(Object value) {
-		this.value = value;
+	public Value(Object rawValue) {
+		this.rawValue = rawValue;
 	}
 	
 	@Override
 	public IFun invoke(Env env) throws Exception {
+		this.value = toValue(env, rawValue);
+		
 		return this;
 	}
 	
+	public abstract Object toValue(Env env, Object rawValue) throws Exception;
+	
 	public Object getValue() {
 		return value;
+	}
+	
+	public Object getRawValue() {
+		return rawValue;
 	}
 	
 	@Override

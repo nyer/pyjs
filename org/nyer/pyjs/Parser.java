@@ -419,13 +419,13 @@ public class Parser {
 			}
 		} else if (tokenizer.peek(BOOLEAN)) {
 			Token token = tokenizer.nextToken();
-			fun = new PjBoolean(java.lang.Boolean.valueOf(token.getStr()));
+			fun = new PjBoolean(token.getStr());
 		} else if (tokenizer.peek(INTEGER)) {
 			Token token = tokenizer.nextToken();
-			fun = new PjInteger(java.lang.Integer.valueOf(token.getStr()));
+			fun = new PjInteger(token.getStr());
 		} else if (tokenizer.peek(FLOAT)) {
 			Token token = tokenizer.nextToken();
-			fun = new PjFloat(java.lang.Float.valueOf(token.getStr()));
+			fun = new PjFloat(token.getStr());
 		} else if (tokenizer.peek(STRING)) {
 			Token token = tokenizer.nextToken();
 			fun = new PjString(token.getStr());

@@ -15,7 +15,7 @@ public class IdentifierAssign extends AbstractFun {
 	@Override
 	public IFun invoke(Env env) throws Exception {
 		IFun arg = value.invoke(env);
-		env.put(identifier.getValue(), arg);
+		env.put(identifier.getStr(), arg);
 		
 		return arg;
 	}

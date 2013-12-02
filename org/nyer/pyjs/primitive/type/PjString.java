@@ -16,12 +16,17 @@ import org.nyer.pyjs.Env;
 public class PjString extends Value {
 
 	public PjString(String value) {
-		super( value);
+		super(value);
 	}
 
 	@Override
 	public String getTypeStr(Env env) {
 		return "String";
+	}
+	
+	@Override
+	public Object toValue(Env env, Object rawValue) throws Exception {
+		return rawValue;
 	}
 	
 	@Override

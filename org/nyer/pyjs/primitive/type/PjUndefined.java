@@ -25,6 +25,11 @@ public class PjUndefined extends Value {
 	}
 	
 	@Override
+	public Object toValue(Env env, Object rawValue) throws Exception {
+		return "";
+	}
+	
+	@Override
 	public String toString() {
 		return "undefined";
 	}

@@ -7,10 +7,12 @@ import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
 
 public class AnonymousFun extends AbstractFun {
+	private Env closure;
 	private String[] parameters;
 	private IFun body;
 	
-	public AnonymousFun(String[] parameters, IFun body) {
+	public AnonymousFun(Env closure, String[] parameters, IFun body) {
+		this.closure = closure;
 		this.parameters = parameters;
 		this.body = body;
 	}
@@ -26,6 +28,10 @@ public class AnonymousFun extends AbstractFun {
 	
 	public IFun getBody() {
 		return body;
+	}
+	
+	public Env getClosure() {
+		return closure;
 	}
 	
 	@Override

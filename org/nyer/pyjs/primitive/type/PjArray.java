@@ -19,14 +19,13 @@ import org.nyer.pyjs.IFun;
 public class PjArray extends Value {
 
 	public PjArray(IFun[] arguments) {
-		this.arguments = arguments;
+		super(arguments);
 	}
 
+
 	@Override
-	public IFun invoke(Env env) throws Exception {
-		this.value = evalArguments(arguments, env);
-		
-		return this;
+	public Object toValue(Env env, Object rawValue) throws Exception {
+		return evalArguments(env, (IFun[]) rawValue);
 	}
 	
 	@Override

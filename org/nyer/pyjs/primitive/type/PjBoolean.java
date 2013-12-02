@@ -15,13 +15,18 @@ import org.nyer.pyjs.Env;
 
 
 public class PjBoolean extends Value  {
-	public PjBoolean(boolean bool) {
+	public PjBoolean(String bool) {
 		super(bool);
 	}
 	
 	@Override
 	public String getTypeStr(Env env) {
 		return "boolean";
+	}
+	
+	@Override
+	public Object toValue(Env env, Object rawValue) throws Exception {
+		return Boolean.valueOf((String)rawValue);
 	}
 	
 	@Override
@@ -34,9 +39,9 @@ public class PjBoolean extends Value  {
 		visitor.visit(this);
 	}
 	
-	public static PjBoolean True = new PjBoolean(true);
+	public static PjBoolean True = new PjBoolean("true");
 	
-	public static PjBoolean False = new PjBoolean(false);
+	public static PjBoolean False = new PjBoolean("false");
 	
 	public static PjBoolean valueOf(boolean bool) {
 		if (bool)

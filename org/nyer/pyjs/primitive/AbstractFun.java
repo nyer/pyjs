@@ -52,7 +52,7 @@ public abstract class AbstractFun implements IFun {
 		throw new Exception("boolean expected, but " + argument + " founded");
 	}
 	
-	protected IFun[] evalArguments(IFun[] arguments, Env env)  throws Exception {
+	protected IFun[] evalArguments(Env env, IFun[] arguments)  throws Exception {
 		IFun[] evaled = new IFun[arguments.length];
 		for (int i = 0,  s = arguments.length; i < s; i ++)
 			evaled[i] = arguments[i].invoke(env);

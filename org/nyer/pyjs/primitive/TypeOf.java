@@ -26,8 +26,8 @@ public class TypeOf extends AbstractFun {
 		IFun arg = arguments[0];
 		if (arg instanceof Identifier) {
 			Identifier identifier = (Identifier) arg;
-			IFun obj = env.lookUp(identifier.getValue());
-			if (obj == null)
+			arg = env.lookUp(identifier.getStr());
+			if (arg == null)
 				arg = new PjUndefined();
 		}
 		

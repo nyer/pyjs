@@ -13,17 +13,16 @@ package org.nyer.pyjs.primitive;
 import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 import org.nyer.pyjs.IFun;
-import org.nyer.pyjs.primitive.type.Value;
 
-public class Identifier extends Value implements Assignable {
-
-	public Identifier(String value) {
-		super( value);
+public class Identifier extends AbstractFun implements Assignable {
+	private String str;
+	public Identifier(String str) {
+		this.str = str;
 	}
 
 	@Override
 	public IFun invoke(Env env) throws Exception {
-		String name = getValue();
+		String name = getStr();
 		IFun obj = env.lookUp(name);
 		if (obj == null)
 			throw new Exception("undefined identifier, " + name);
@@ -31,9 +30,8 @@ public class Identifier extends Value implements Assignable {
 		return obj;
 	}
 	
-	@Override
-	public String getValue() {
-		return (String) super.getValue();
+	public String getStr() {
+		return str;
 	}
 	
 	@Override

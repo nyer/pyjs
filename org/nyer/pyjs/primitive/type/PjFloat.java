@@ -14,13 +14,18 @@ import org.nyer.pyjs.ElementVisitor;
 import org.nyer.pyjs.Env;
 
 public class PjFloat extends Value {
-	public PjFloat(float value) {
+	public PjFloat(String value) {
 		super(value);
 	}
 
 	@Override
 	public String getTypeStr(Env env) {
 		return "float";
+	}
+	
+	@Override
+	public Object toValue(Env env, Object rawValue) throws Exception {
+		return Float.valueOf((String)rawValue);
 	}
 	
 	@Override
@@ -34,6 +39,6 @@ public class PjFloat extends Value {
 	}
 	
 	public static PjFloat valueOf(final float v) {
-		return new PjFloat(v);
+		return new PjFloat(v + "");
 	}
 }

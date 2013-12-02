@@ -31,13 +31,14 @@ public class FunCall extends AbstractFun {
 			throw new Exception("function expected , but given:  " + func);
 		AnonymousFun anonymousFun = (AnonymousFun) func;
 
-		IFun[] evaled = evalArguments(arguments, env);
+		IFun[] evaled = evalArguments(env, arguments);
 		
 		String[] parameters = anonymousFun.getParameters();
 		if (parameters.length != arguments.length)
 			throw new Exception("expected " + parameters.length + ", but given " + Arrays.toString(evaled));
 		
-		env = env.extend(parameters, evaled);
+		Env closure = anonymousFun.getClosure();
+		env = closure.extend(parameters, evaled);
 		return func.invoke(env);
 	}
 	

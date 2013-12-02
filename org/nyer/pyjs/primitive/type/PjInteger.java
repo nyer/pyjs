@@ -16,13 +16,18 @@ import org.nyer.pyjs.Env;
 
 public class PjInteger extends Value  {
 
-	public PjInteger(int value) {
+	public PjInteger(String value) {
 		super(value);
 	}
 	
 	@Override
 	public String getTypeStr(Env env) {
 		return "integer";
+	}
+	
+	@Override
+	public Object toValue(Env env, Object rawValue) throws Exception {
+		return Integer.valueOf((String) rawValue);
 	}
 	
 	@Override
@@ -36,7 +41,7 @@ public class PjInteger extends Value  {
 	}
 	
 	public static PjInteger valueOf(final int v) {
-		return new PjInteger(v);
+		return new PjInteger(v + "");
 	}
 	
 	@Override

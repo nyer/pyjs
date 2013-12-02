@@ -25,8 +25,8 @@ public class DefFun extends AbstractFun {
 	}
 	
 	@Override
-	public IFun invoke(final Env closure) throws Exception {
-		IFun func =new AnonymousFun(parameters, body);
+	public IFun invoke(Env closure) throws Exception {
+		IFun func =new AnonymousFun(closure, parameters, body);
 		return func;
 	}
 	
