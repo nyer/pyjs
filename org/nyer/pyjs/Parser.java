@@ -252,7 +252,7 @@ public class Parser {
 
 	private IFun relExp() throws Exception {
 		IFun fun = addSubExp();
-		while (tokenizer.peek(LT) || tokenizer.peek(LTE)
+		if (tokenizer.peek(LT) || tokenizer.peek(LTE)
 				|| tokenizer.peek(GT) || tokenizer.peek(GTE)) {
 			if (tokenizer.accept(LT)) {
 				fun = new LT(fun, addSubExp());

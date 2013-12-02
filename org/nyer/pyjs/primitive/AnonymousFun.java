@@ -35,6 +35,6 @@ public class AnonymousFun extends AbstractFun {
 
 	@Override
 	public String toString() {
-		return "AnonymousFun [parameters=" + Arrays.toString(parameters) + "]";
+		return "function [parameters=" + Arrays.toString(parameters) + "]";
 	}
 }
