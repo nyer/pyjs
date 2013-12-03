@@ -43,7 +43,7 @@ public class Interpreter {
 			ret = fun.invoke(env);
 		}
 		
-		return ret.invoke(env);
+		return ret;
 	}
 	
 	public Object run(String code) throws Exception {

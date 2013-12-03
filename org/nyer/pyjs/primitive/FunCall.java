@@ -26,7 +26,7 @@ public class FunCall extends AbstractFun {
 
 	@Override
 	public IFun invoke(Env env) throws Exception {
-		func = func.invoke(env);
+		IFun func = this.func.invoke(env);
 		if (func instanceof AnonymousFun == false)
 			throw new Exception("function expected , but given:  " + func);
 		AnonymousFun anonymousFun = (AnonymousFun) func;

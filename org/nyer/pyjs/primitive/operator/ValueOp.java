@@ -21,12 +21,7 @@ public abstract class ValueOp extends AbstractFun {
 	
 	@Override
 	public IFun invoke(Env env) throws Exception {
-		IFun[] evaled = new IFun[arguments.length];
-		
-		for (int i = 0, s = arguments.length; i < s; i ++)
-			evaled[i] = arguments[i].invoke(env);
-		
-		return invokeIntern(env, evaled);
+		return invokeIntern(env, evalArguments(env, arguments));
 	}
 	
 	public abstract IFun invokeIntern(Env env, IFun[] arguments) throws Exception;
