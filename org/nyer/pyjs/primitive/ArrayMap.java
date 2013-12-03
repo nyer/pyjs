@@ -18,6 +18,7 @@ import org.nyer.pyjs.IFun;
 import org.nyer.pyjs.primitive.type.PjArray;
 import org.nyer.pyjs.primitive.type.PjInteger;
 import org.nyer.pyjs.primitive.type.PjMap;
+import org.nyer.pyjs.primitive.type.PjUndefined;
 import org.nyer.pyjs.primitive.type.Value;
 
 public class ArrayMap extends AbstractFun implements Assignable {
@@ -52,7 +53,10 @@ public class ArrayMap extends AbstractFun implements Assignable {
 			return value[idxV];
 		} else {
 			Map<Value, IFun> map = ((PjMap)obj).getValue();
-			return map.get(key);
+			IFun value = map.get(key);
+			if (value == null)
+				value = new PjUndefined();
+			return value;
 		}
 	}
 
