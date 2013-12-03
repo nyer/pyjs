@@ -22,7 +22,6 @@ public class PjArray extends Value {
 		super(arguments);
 	}
 
-
 	@Override
 	public Object toValue(Env env, Object rawValue) throws Exception {
 		return evalArguments(env, (IFun[]) rawValue);

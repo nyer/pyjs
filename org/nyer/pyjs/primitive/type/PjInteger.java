@@ -20,6 +20,10 @@ public class PjInteger extends Value  {
 		super(value);
 	}
 	
+	public PjInteger(int value) {
+		this.value = value;
+	}
+	
 	@Override
 	public String getTypeStr(Env env) {
 		return "integer";
@@ -41,7 +45,7 @@ public class PjInteger extends Value  {
 	}
 	
 	public static PjInteger valueOf(final int v) {
-		return new PjInteger(v + "");
+		return new PjInteger(v);
 	}
 	
 	@Override

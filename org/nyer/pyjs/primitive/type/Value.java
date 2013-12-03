@@ -22,9 +22,12 @@ public abstract class Value extends AbstractFun {
 		this.rawValue = rawValue;
 	}
 	
+	public Value() {}
+	
 	@Override
 	public IFun invoke(Env env) throws Exception {
-		this.value = toValue(env, rawValue);
+		if (value == null)
+			this.value = toValue(env, rawValue);
 		
 		return this;
 	}

@@ -17,8 +17,9 @@ public class PjString extends Value {
 
 	public PjString(String value) {
 		super(value);
+		this.value = value;
 	}
-
+	
 	@Override
 	public String getTypeStr(Env env) {
 		return "String";

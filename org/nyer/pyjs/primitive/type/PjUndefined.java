@@ -17,6 +17,7 @@ public class PjUndefined extends Value {
 
 	public PjUndefined() {
 		super("");
+		this.value = "";
 	}
 	
 	@Override

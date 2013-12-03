@@ -17,6 +17,10 @@ public class PjFloat extends Value {
 	public PjFloat(String value) {
 		super(value);
 	}
+	
+	public PjFloat(float value) {
+		this.value = value;
+	}
 
 	@Override
 	public String getTypeStr(Env env) {
@@ -39,6 +43,6 @@ public class PjFloat extends Value {
 	}
 	
 	public static PjFloat valueOf(final float v) {
-		return new PjFloat(v + "");
+		return new PjFloat(v);
 	}
 }

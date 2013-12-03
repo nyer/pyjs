@@ -19,6 +19,10 @@ public class PjBoolean extends Value  {
 		super(bool);
 	}
 	
+	public PjBoolean(boolean bool) {
+		this.value = bool;
+	}
+	
 	@Override
 	public String getTypeStr(Env env) {
 		return "boolean";
@@ -39,9 +43,9 @@ public class PjBoolean extends Value  {
 		visitor.visit(this);
 	}
 	
-	public static PjBoolean True = new PjBoolean("true");
+	public static PjBoolean True = new PjBoolean(true);
 	
-	public static PjBoolean False = new PjBoolean("false");
+	public static PjBoolean False = new PjBoolean(false);
 	
 	public static PjBoolean valueOf(boolean bool) {
 		if (bool)
